@@ -12,7 +12,7 @@ fn main() {
         f0,
         BasicFilterWidth::Q(1.414),
     );
-    let filter = make_filter(cs);
+    let mut filter = make_filter(cs);
 
     let x: Vec<f64> = (0..fs)
         .map(|i| {
@@ -25,11 +25,7 @@ fn main() {
         })
         .collect();
 
-    let mut y: Vec<f64> = vec![0.0, 0.0];
-    for i in 0..fs-3 {
-        let y0 = filter(&x[i..=i + 2], &y[i..=i + 1]);
-        y.push(y0);
-    }
+    let y: Vec<f64> = x.into_iter().map(|x| filter(x)).collect();
 
     y.into_iter().for_each(|y| println!("{}", y));
 }

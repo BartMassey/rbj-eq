@@ -46,12 +46,9 @@ pub fn basic_filter_coeffs(
     let w0 = 2.0 * PI * f0 / fs;
     let sin_w0 = w0.sin();
     let alpha = match width {
-        BasicFilterWidth::Q(q) =>
-            0.5 * sin_w0 / q,
+        BasicFilterWidth::Q(q) => 0.5 * sin_w0 / q,
         BasicFilterWidth::BandWidth(bw) =>
-            sin_w0 * f64::sinh(
-                0.5 * f64::ln(2.0) * bw * w0 / sin_w0
-            ),
+            sin_w0 * f64::sinh(0.5 * f64::ln(2.0) * bw * w0 / sin_w0),
     };
     let cos_w0 = w0.cos();
     let cos_2m = -2.0 * cos_w0;
@@ -75,13 +72,17 @@ pub fn basic_filter_coeffs(
     FilterCoeffs::new(b, a)
 }
 
-pub fn make_filter(coeffs: FilterCoeffs) -> Box<dyn Fn(&[f64], &[f64]) -> f64> {
-    Box::new(
-        move |xs: &[f64], ys: &[f64]| {
-            assert_eq!(3, xs.len());
-            assert_eq!(2, ys.len());
-            coeffs.g * xs[2] + coeffs.b[0] * xs[1] + coeffs.b[1] * xs[0]
-                - coeffs.a[0] * ys[1] - coeffs.a[1] * ys[0]
-        }
-    )
+pub fn make_filter(coeffs: FilterCoeffs) -> Box<dyn FnMut(f64) -> f64> {
+    let mut ys = [0.0; 2];
+    let mut xs = [0.0; 2];
+    Box::new(move |x| {
+        let y = coeffs.g * x
+            + coeffs.b[0] * xs[0] + coeffs.b[1] * xs[1]
+            - coeffs.a[0] * ys[0] - coeffs.a[1] * ys[1];
+        ys[1] = ys[0];
+        ys[0] = y;
+        xs[1] = xs[0];
+        xs[0] = x;
+        y
+    })
 }
