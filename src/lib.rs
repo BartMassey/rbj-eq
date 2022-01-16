@@ -3,24 +3,20 @@
 use std::f64::consts::PI;
 
 #[derive(Clone, Copy)]
-pub enum FilterType {
+pub enum BasicFilterType {
     LowPass,
     HighPass,
     BandPassQ,
     BandPassC,
     BandNotch,
     AllPass,
-    PeakingEq,
-    LowShelf,
-    HighShelf,
 }
-use FilterType::*;
+use BasicFilterType::*;
 
 #[derive(Clone, Copy)]
-pub enum FilterWidth {
+pub enum BasicFilterWidth {
     Q(f64),
     BandWidth(f64),
-    Slope(f64),
 }
 
 #[derive(Clone, Copy)]
@@ -30,38 +26,53 @@ pub struct FilterCoeffs {
     a: [f64; 2],
 }
 
-pub fn coeffs(
-    filter_type: FilterType,
+impl FilterCoeffs {
+    fn new(b: [f64; 3], a: [f64; 3]) -> Self {
+        let a_inv = 1.0 / a[0];
+        FilterCoeffs {
+            g: b[0] * a_inv,
+            b: [b[1] * a_inv, b[2] * a_inv],
+            a: [a[1] * a_inv, a[2] * a_inv],
+        }
+    }
+}
+
+pub fn basic_filter_coeffs(
+    filter_type: BasicFilterType,
     fs: f64,
     f0: f64,
-    gain: f64,
-    width: FilterWidth,
+    width: BasicFilterWidth,
 ) -> FilterCoeffs {
     let w0 = 2.0 * PI * f0 / fs;
-    let cos_w0 = w0.cos();
     let sin_w0 = w0.sin();
     let alpha = match width {
-        FilterWidth::Q(q) => 0.5 * sin_w0 / q,
-        FilterWidth::BandWidth(bw) => sin_w0 * f64::sinh(
-            0.5 * f64::ln(2.0) * bw * w0 / sin_w0
-        ),
-        FilterWidth::Slope(s) => {
-            let a = f64::powf(10.0, gain / 40.0);
-            0.5 * sin_w0 * f64::sqrt((a + 1.0 / a) * (1.0 / s - 1.0) + 2.0)
-        },
+        BasicFilterWidth::Q(q) =>
+            0.5 * sin_w0 / q,
+        BasicFilterWidth::BandWidth(bw) =>
+            sin_w0 * f64::sinh(
+                0.5 * f64::ln(2.0) * bw * w0 / sin_w0
+            ),
     };
-    let (b, a) = match filter_type {
-        LowPass => (
-            [0.5 - 0.5 * cos_w0, 1.0 - cos_w0, 0.5 - 0.5 * cos_w0],
-            [1.0 + alpha, -2.0 * cos_w0, 1.0 - alpha],
-        ),
-        _ => todo!(),
+    let cos_w0 = w0.cos();
+    let cos_2m = -2.0 * cos_w0;
+    let sin_p2 = 0.5 * sin_w0;
+    let sin_m2 = -0.5 * sin_w0;
+    let cos_1m = 1.0 - cos_w0;
+    let cos_1pm = -(1.0 + cos_w0);
+    let cos_1m2 = 0.5 - 0.5 * cos_w0;
+    let cos_1p2 = 0.5 + 0.5 * cos_w0;
+    let a_1m = 1.0 - alpha;
+    let a_1p = 1.0 + alpha;
+    let a = [a_1p, cos_2m, a_1m];
+    let b = match filter_type {
+        LowPass => [cos_1m2, cos_1m, cos_1m2],
+        HighPass => [cos_1p2, cos_1pm, cos_1p2],
+        BandPassQ => [sin_p2, 0.0, sin_m2],
+        BandPassC => [alpha, 0.0, -alpha],
+        BandNotch => [1.0, cos_2m, 1.0],
+        AllPass => [a_1m, cos_2m, a_1p],
     };
-    FilterCoeffs {
-        g: b[0] / a[0],
-        b: [b[1] / a[0], b[2] / a[0]],
-        a: [a[1] / a[0], a[2] / a[0]],
-    }
+    FilterCoeffs::new(b, a)
 }
 
 pub fn make_filter(coeffs: FilterCoeffs) -> Box<dyn Fn(&[f64], &[f64]) -> f64> {
