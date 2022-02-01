@@ -6,10 +6,10 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
     let f0: f64 = args[1].parse().unwrap();
     let fs = 48_000;
-    let cs = BandPassQFilter.coeffs(
+    let cs = PeakingFilter.coeffs(
         fs as f64,
         f0,
-        FilterWidth::Q(1.414),
+        FilterWidth::Slope { gain: 10.0, slope: 1.0 },
     );
     let mut filter = Filter::new(cs);
 
