@@ -140,81 +140,9 @@ impl FilterType {
         };
         FilterCoeffs::new(b, a)
     }
-
-    // https://www.andyc.diy-audio-engineering.org/parametric-eq-parameters/index.html
-    pub fn transfer(self, s0: f64, width: FilterWidth) -> Transfer {
-        let (q_inv, a2) = match width {
-            FilterWidth::Q(q) => (1.0 / q, 0.0),
-            FilterWidth::BandWidth(bw) => {
-                let w0 = 2.0 * PI * s0;
-                let q_inv = 2.0 * f64::sinh(
-                    0.5 * f64::ln(2.0) * bw * w0 / w0.sin()
-                );
-                (q_inv, 0.0)
-            }
-            FilterWidth::Slope { gain, slope } => {
-                let a2 = f64::powf(10.0, gain / 80.0);
-                let a = a2 * a2;
-                let q_inv = f64::sqrt(
-                    (a + 1.0 / a) * (1.0 / slope - 1.0) + 2.0
-                );
-                (q_inv, a2)
-            }
-        };
-        Transfer { filter_type: self, q_inv, a2, w0: s0 }
-    }
 }
 
-#[derive(Clone, Copy)]
-pub struct Transfer {
-    filter_type: FilterType,
-    q_inv: f64,
-    a2: f64,
-    w0: f64,
-}
 
-impl Transfer {
-    pub fn transfer(self, s: f64) -> f64 {
-        let a2 = self.a2;
-        let a = a2 * a2;
-        let q_inv = self.q_inv;
-        let w0 = self.w0;
-        match self.filter_type {
-            FilterType::Basic(filter_type) => {
-                let denom = s * s + s * q_inv * w0 + w0 * w0;
-                match filter_type {
-                    LowPass => w0 * w0 / denom,
-                    HighPass => s * s / denom,
-                    BandPassQ => s * w0 / denom,
-                    BandPassC => s * w0 * q_inv / denom,
-                    BandNotch => (s * s + w0 * w0) / denom,
-                    AllPass => (s * s - s * w0 * q_inv + w0 * w0) / denom,
-                }
-            }
-            FilterType::Eq(filter_type) => {
-                match filter_type {
-                    Peaking => {
-                        let num = s * s + s * w0 * a * q_inv + w0 * w0;
-                        let denom = s * s + s * q_inv / a + w0 * w0;
-                        num / denom
-                    }
-                    Shelf(filter_type) => match filter_type {
-                        LowShelf => {
-                            let num = a * (s * s + a2 * q_inv * w0 * s + a * w0 * w0);
-                            let denom = a * s * s + a2 * q_inv * w0 * s + w0 * w0;
-                            num / denom
-                        }
-                        HighShelf => {
-                            let num = a * (a * s * s + a2 * q_inv * s * w0 + w0 * w0);
-                            let denom = s * s + a2 * q_inv * s * w0 + w0 * w0;
-                            num / denom
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
 
 #[derive(Clone)]
 pub struct FilterCoeffs {
@@ -231,6 +159,22 @@ impl FilterCoeffs {
             b: [b[1] * a_inv, b[2] * a_inv],
             a: [a[1] * a_inv, a[2] * a_inv],
         }
+    }
+
+    // https://dsp.stackexchange.com/a/16911
+    pub fn transfer(&self, w: f64) -> f64 {
+        let phi = f64::sin(0.5 * w);
+        let phi = phi * phi;
+        let a = [1.0, self.a[0], self.a[1]];
+        let b = [self.g, self.b[0], self.b[1]];
+        let erator = |c: [f64; 3]| -> f64 {
+            let t1 = 0.5 * (c[0] + c[1] + c[2]);
+            let t2 = -phi * (
+                4.0 * c[0] * c[2] * (1.0 - phi) + c[1] * (c[0] + c[2])
+            );
+            t1 * t1 + t2
+        };
+        erator(b) / erator(a)
     }
 }
 
