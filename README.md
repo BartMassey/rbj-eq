@@ -19,8 +19,8 @@ project I was working on. This proposes to be such.
 
 For now, the crate provides barely-tried implementations of
 the RBJ filters in safe Rust. You can look at the Rustdoc
-for these once it's available. There are also first attempts
-at transfer functions, which are currently badly wrong.
+for these once it's available. There is also an attempt at
+transfer function calculation for these filters.
 
 No license as of yet, since I wouldn't encourage anyone to
 use this until it is more cooked. *Caveat emptor.*
