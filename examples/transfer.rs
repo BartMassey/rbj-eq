@@ -1,4 +1,4 @@
-use std::f64::consts::PI;
+use std::f64::consts::TAU;
 
 use rbj_eq::*;
 
@@ -9,11 +9,14 @@ fn main() {
     let coeffs = PeakingFilter.coeffs(
         fs as f64,
         f0,
-        FilterWidth::Slope { gain: 10.0, slope: 1.0 },
+        FilterWidth::Slope {
+            gain: 10.0,
+            slope: 1.0,
+        },
     );
 
     for i in 0..fs {
-        let x = PI * i as f64 / fs as f64;
+        let x = 0.5 * TAU * i as f64 / fs as f64;
         let y = coeffs.transfer(x);
         println!("{} {}", i / 2, y);
     }

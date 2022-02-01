@@ -1,9 +1,9 @@
-//! https://webaudio.github.io/Audio-Eq-Cookbook/Audio-Eq-Cookbook.txt
+//! https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html
 
 mod filter_names;
 pub use filter_names::*;
 
-use std::f64::consts::PI;
+use std::f64::consts::TAU;
 
 #[derive(Debug, Clone, Copy)]
 pub enum BasicFilter {
@@ -45,13 +45,8 @@ pub enum FilterType {
 use FilterType::*;
 
 impl FilterType {
-    pub fn coeffs(
-        self,
-        fs: f64,
-        f0: f64,
-        width: FilterWidth,
-    ) -> FilterCoeffs {
-        let w0 = 2.0 * PI * f0 / fs;
+    pub fn coeffs(self, fs: f64, f0: f64, width: FilterWidth) -> FilterCoeffs {
+        let w0 = TAU * f0 / fs;
         let sin_w0 = w0.sin();
         let (a2, alpha) = match width {
             FilterWidth::Q(q) => {
@@ -59,13 +54,19 @@ impl FilterType {
                 (0.0, alpha)
             }
             FilterWidth::BandWidth(bw) => {
-                let alpha = sin_w0 * f64::sinh(0.5 * f64::ln(2.0) * bw * w0 / sin_w0);
+                #[rustfmt::skip]
+                let alpha = sin_w0 * f64::sinh(
+                    0.5 * f64::ln(2.0) * bw * w0 / sin_w0
+                );
                 (0.0, alpha)
             }
             FilterWidth::Slope { gain, slope } => {
                 let a2 = f64::powf(10.0, gain / 80.0);
                 let a = a2 * a2;
-                let alpha = sin_w0 * 0.5 *  f64::sqrt((a + 1.0 / a) * (1.0 / slope - 1.0) + 2.0);
+                #[rustfmt::skip]
+                let alpha = sin_w0 * 0.5 * f64::sqrt(
+                    (a + 1.0 / a) * (1.0 / slope - 1.0) + 2.0
+                );
                 (a2, alpha)
             }
         };
@@ -113,6 +114,7 @@ impl FilterType {
                                     2.0 * a1 * (a1m - a1pc),
                                     a1 * (a1p - a1mc + s2),
                                 ];
+                                #[rustfmt::skip]
                                 let a = [
                                     a1p + a1mc + s2,
                                     2.0 * (a1m - a1pc),
@@ -126,6 +128,7 @@ impl FilterType {
                                     -2.0 * a1 * (a1m + a1pc),
                                     a1 * (a1p + a1mc - s2),
                                 ];
+                                #[rustfmt::skip]
                                 let a = [
                                     a1p - a1mc + s2,
                                     2.0 * (a1m - a1pc),
@@ -141,8 +144,6 @@ impl FilterType {
         FilterCoeffs::new(b, a)
     }
 }
-
-
 
 #[derive(Clone)]
 pub struct FilterCoeffs {
@@ -169,12 +170,14 @@ impl FilterCoeffs {
         let b = [self.g, self.b[0], self.b[1]];
         let erator = |c: [f64; 3]| -> f64 {
             let t1 = 0.5 * (c[0] + c[1] + c[2]);
+            #[rustfmt::skip]
             let t2 = -phi * (
-                4.0 * c[0] * c[2] * (1.0 - phi) + c[1] * (c[0] + c[2])
+                4.0 * c[0] * c[2] * (1.0 - phi) +
+                c[1] * (c[0] + c[2])
             );
             t1 * t1 + t2
         };
-        erator(b) / erator(a)
+        f64::sqrt(erator(b) / erator(a))
     }
 }
 
@@ -193,8 +196,9 @@ impl Filter {
             coeffs,
         }
     }
-        
+
     pub fn filter(&mut self, x: f64) -> f64 {
+        #[rustfmt::skip]
         let y = self.coeffs.g * x
             + self.coeffs.b[0] * self.xs[0] + self.coeffs.b[1] * self.xs[1]
             - self.coeffs.a[0] * self.ys[0] - self.coeffs.a[1] * self.ys[1];
