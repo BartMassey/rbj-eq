@@ -1,5 +1,4 @@
 ![Maintenance](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
-[![api-docs](https://docs.rs/rbj-eq/badge.svg)](https://docs.rs/rbj-eq)
 
 # rbj-eq: Rust implementation of RBJ EQ filters
 Bart Massey 2022 (version 0.1.0)
@@ -66,8 +65,11 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 (See the `examples` directory of this distribution for more examples.)
 
 
+Full crate [rustdoc](https://bartmassey.github.io/rbj-eq/rbj-eq/index.html)
+is available.
+
 This crate is made available under the "MIT
-license". Please see the file `LICENSE` in this distribution
+license". Please see the file `LICENSE.txt` in this distribution
 for license terms.
 
 Thanks to the `cargo-readme` crate for generation of this `README`.
