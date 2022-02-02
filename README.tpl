@@ -5,7 +5,7 @@ Bart Massey 2022 (version {{version}})
 
 {{readme}}
 
-Full crate [rustdoc](https://bartmassey.github.io/rbj-eq/rbj-eq/index.html)
+Full crate [rustdoc](https://bartmassey.github.io/rbj-eq/rbj_eq/index.html)
 is available.
 
 This crate is made available under the "{{license}}

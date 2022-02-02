@@ -65,7 +65,7 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 (See the `examples` directory of this distribution for more examples.)
 
 
-Full crate [rustdoc](https://bartmassey.github.io/rbj-eq/rbj-eq/index.html)
+Full crate [rustdoc](https://bartmassey.github.io/rbj-eq/rbj_eq/index.html)
 is available.
 
 This crate is made available under the "MIT
