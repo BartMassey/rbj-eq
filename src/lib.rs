@@ -61,7 +61,7 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 (See the `examples` directory of this distribution for more examples.)
 
 */
-                                                                   
+
 mod filter_names;
 pub use filter_names::*;
 
