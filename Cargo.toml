@@ -2,3 +2,9 @@
 name = "rbj-eq"
 version = "0.1.0"
 edition = "2021"
+authors = ["Bart Massey <bart.massey@gmail.com>"]
+description = 'Robert Bristow-Johnson "equalizer filters"'
+license = "MIT"
+repository = "https://github.com/BartMassey/rbj-eq"
+readme = "README.md"
+categories = ["text-processing"]

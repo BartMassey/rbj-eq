@@ -1,50 +1,139 @@
-//! https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html
+/*!
+# Background
 
+Back in the day, DSP guru Robert Bristow-Johnson published a
+famous document titled [*Cookbook formulae for audio
+equalizer biquad filter
+coefficients*](https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html). This
+is a really nice account of how to build "biquad" IIR
+filters useful for audio equalization, and also for a variety of
+other audio tasks. The RBJ filters are characterized by
+being extremely cheap to run, cheap to build on-the-fly, and
+having nice composability properties.
+
+Many implementations of the RBJ filters exist in a variety
+of languages. This is the author's implementation in Rust.
+
+# RBJ Filters
+
+This crate provides implementations of the RBJ filters in
+safe Rust. What you get:
+
+* Function to compute filter coefficients for the various
+  RBJ filter types.
+
+* Transfer function magnitude, derived from the
+  coefficients.
+
+* A stateful filter function, based on the coefficients.
+
+# Examples
+
+```
+use rbj_eq::{LowPassFilter, Filter, FilterWidth};
+
+// Make a sine wave at Nyquist.
+let samples: Vec<f64> = (0..128)
+    .map(|i| if i % 2 == 0 { 1.0 } else { -1.0 })
+    .collect();
+
+// Construct a half-band filter.
+let cs = LowPassFilter.coeffs(
+    24_000.0,
+    6_000.0,
+    FilterWidth::Slope {
+        gain: 0.0,
+        slope: 1.0,
+    },
+);
+let mut filter = Filter::new(cs);
+
+// Filter the signal.
+let filtered: Vec<f64> =
+    samples.into_iter().map(|x| filter.filter(x)).collect();
+
+// The signal is damped. (The filter takes a few samples to converge.)
+for (i, y) in filtered.iter().skip(4).enumerate() {
+    assert!(y.abs() < 0.01, "filter fail: {i} {y}");
+}
+```
+
+(See the `examples` directory of this distribution for more examples.)
+
+*/
+                                                                   
 mod filter_names;
 pub use filter_names::*;
 
 use std::f64::consts::TAU;
 
+#[doc(hidden)]
+/// Filter types for "standard" filters.
 #[derive(Debug, Clone, Copy)]
 pub enum BasicFilter {
+    /// Lowpass filter.
     LowPass,
+    /// Highpass filter.
     HighPass,
+    /// Bandpass filter, with constant skirt gain and peak gain Q.
     BandPassQ,
+    /// Bandpass filter, with constant 0dB peak gain.
     BandPassC,
+    /// Bandnotch filter.
     BandNotch,
+    /// All-pass filter.
     AllPass,
 }
 use BasicFilter::*;
 
+#[doc(hidden)]
+/// Filter types for EQ shelf filters.
 #[derive(Debug, Clone, Copy)]
 pub enum ShelfFilter {
+    /// Lowpass shelf filter.
     LowShelf,
+    /// Highpass shelf filter.
     HighShelf,
 }
 use ShelfFilter::*;
 
+#[doc(hidden)]
+/// Filter types for EQ filters.
 #[derive(Debug, Clone, Copy)]
 pub enum EqFilter {
+    /// Shelf filter.
     Shelf(ShelfFilter),
+    /// Peaking bandpass filter.
     Peaking,
 }
 use EqFilter::*;
 
-#[derive(Debug, Clone, Copy)]
-pub enum FilterWidth {
-    Q(f64),
-    BandWidth(f64),
-    Slope { gain: f64, slope: f64 },
-}
-
+#[doc(hidden)]
+/// Filters are either "standard" or RBJ-eq-style.
 #[derive(Debug, Clone, Copy)]
 pub enum FilterType {
+    /// "Standard" filter.
     Basic(BasicFilter),
+    /// RBJ equalizer filter.
     Eq(EqFilter),
 }
 use FilterType::*;
 
+/// Width / gain specification for filters.
+#[derive(Debug, Clone, Copy)]
+pub enum FilterWidth {
+    /// Specify width / gain using "EE Q".
+    Q(f64),
+    /// Specify width / gain using filter half-band width.
+    BandWidth(f64),
+    /// Specify width / gain using filter peak gain and tail slope.
+    Slope { gain: f64, slope: f64 },
+}
+
 impl FilterType {
+    /// Calculate biquad filter coefficients for the given filter type,
+    /// sampling frequency (actually sampling rate, so twice Nyquist),
+    /// critical frequency, and filter width.
     pub fn coeffs(self, fs: f64, f0: f64, width: FilterWidth) -> FilterCoeffs {
         let w0 = TAU * f0 / fs;
         let sin_w0 = w0.sin();
@@ -145,6 +234,7 @@ impl FilterType {
     }
 }
 
+/// Biquad filter coefficients (normalized for filter operation).
 #[derive(Clone)]
 pub struct FilterCoeffs {
     g: f64,
@@ -162,7 +252,10 @@ impl FilterCoeffs {
         }
     }
 
-    // https://dsp.stackexchange.com/a/16911
+    /// Transfer function magnitude for filter, at given
+    /// fraction of unit frequency.  This uses a nice
+    /// [transformation by RBJ](https://dsp.stackexchange.com/a/16911)
+    /// for better numerical stability.
     pub fn transfer(&self, w: f64) -> f64 {
         let phi = f64::sin(0.5 * w);
         let phi = phi * phi;
@@ -181,6 +274,7 @@ impl FilterCoeffs {
     }
 }
 
+/// Biquad filter state (including coefficients).
 #[derive(Clone)]
 pub struct Filter {
     ys: [f64; 2],
@@ -189,6 +283,8 @@ pub struct Filter {
 }
 
 impl Filter {
+    /// Make a new biquad filter with the given coefficients.
+    /// Initial state is zeros.
     pub fn new(coeffs: FilterCoeffs) -> Self {
         Self {
             ys: [0.0; 2],
@@ -197,6 +293,8 @@ impl Filter {
         }
     }
 
+    /// Step the filter forward, advancing the state and returning
+    /// one output.
     pub fn filter(&mut self, x: f64) -> f64 {
         #[rustfmt::skip]
         let y = self.coeffs.g * x
