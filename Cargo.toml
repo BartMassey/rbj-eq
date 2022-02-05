@@ -7,4 +7,4 @@ description = 'Robert Bristow-Johnson "equalizer filters"'
 license = "MIT"
 repository = "https://github.com/BartMassey/rbj-eq"
 readme = "README.md"
-categories = ["text-processing"]
+categories = ["multimedia::audio"]
