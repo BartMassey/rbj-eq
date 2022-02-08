@@ -1,7 +1,7 @@
 ![Maintenance](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
 
 # rbj-eq: Rust implementation of RBJ EQ filters
-Bart Massey 2022 (version 0.1.0)
+Bart Massey 2022 (version 0.4.0)
 
 ## Background
 
@@ -34,7 +34,7 @@ safe Rust. What you get:
 ## Examples
 
 ```rust
-use rbj_eq::{LowPassFilter, Filter, FilterWidth};
+use rbj_eq::{LowPassFilter, FilterWidth};
 
 // Make a sine wave at Nyquist.
 let samples: Vec<f64> = (0..128)
@@ -43,18 +43,17 @@ let samples: Vec<f64> = (0..128)
 
 // Construct a half-band filter.
 let cs = LowPassFilter.coeffs(
-    24_000.0,
-    6_000.0,
+    0.5,
     FilterWidth::Slope {
         gain: 0.0,
         slope: 1.0,
     },
 );
-let mut filter = Filter::new(cs);
+let mut filter = cs.make_filter();
 
 // Filter the signal.
 let filtered: Vec<f64> =
-    samples.into_iter().map(|x| filter.filter(x)).collect();
+    samples.into_iter().map(|x| filter(x)).collect();
 
 // The signal is damped. (The filter takes a few samples to converge.)
 for (i, y) in filtered.iter().skip(4).enumerate() {

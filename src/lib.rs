@@ -39,8 +39,7 @@ let samples: Vec<f64> = (0..128)
 
 // Construct a half-band filter.
 let cs = LowPassFilter.coeffs(
-    24_000.0,
-    6_000.0,
+    0.5,
     FilterWidth::Slope {
         gain: 0.0,
         slope: 1.0,
@@ -132,10 +131,9 @@ pub enum FilterWidth {
 
 impl FilterType {
     /// Calculate biquad filter coefficients for the given filter type,
-    /// sampling frequency (actually sampling rate, so twice Nyquist),
-    /// critical frequency, and filter width.
-    pub fn coeffs(self, fs: f64, f0: f64, width: FilterWidth) -> FilterCoeffs {
-        let w0 = TAU * f0 / fs;
+    /// critical frequency (as fraction of Nyquist), and filter width.
+    pub fn coeffs(self, fc: f64, width: FilterWidth) -> FilterCoeffs {
+        let w0 = 0.5 * TAU * fc;
         let sin_w0 = w0.sin();
         let (a2, alpha) = match width {
             FilterWidth::Q(q) => {
