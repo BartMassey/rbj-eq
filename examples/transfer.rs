@@ -15,9 +15,10 @@ fn main() {
         },
     );
 
+    let transfer = coeffs.make_transfer_mag();
     for i in 0..fs {
         let x = 0.5 * TAU * i as f64 / fs as f64;
-        let y = coeffs.transfer(x);
+        let y = transfer(x);
         println!("{} {}", i / 2, y);
     }
 }

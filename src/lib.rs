@@ -246,28 +246,32 @@ impl FilterCoeffs {
         Self { b, a }
     }
 
-    /// Transfer function magnitude for filter, at given
-    /// fraction of unit frequency.  This uses a nice
-    /// [transformation by RBJ](https://dsp.stackexchange.com/a/16911)
-    /// for better numerical stability.
-    pub fn transfer(&self, w: f64) -> f64 {
-        let phi = f64::sin(0.5 * w);
-        let phi = phi * phi;
-        let erator = |c: &[f64; 3]| -> f64 {
-            let t1 = 0.5 * (c[0] + c[1] + c[2]);
-            #[rustfmt::skip]
-            let t2 = -phi * (
-                4.0 * c[0] * c[2] * (1.0 - phi) +
-                c[1] * (c[0] + c[2])
-            );
-            t1 * t1 + t2
-        };
-        f64::sqrt(erator(&self.b) / erator(&self.a))
+    /// Make a transfer function magnitude function. Input
+    /// is fraction of unit filter frequency.  This uses a
+    /// nice [transformation by
+    /// RBJ](https://dsp.stackexchange.com/a/16911) for
+    /// better numerical stability.
+    pub fn make_transfer_mag(&self) -> impl Fn(f64) -> f64 + '_ {
+        |w: f64| {
+            let phi = f64::sin(0.5 * w);
+            let phi = phi * phi;
+            let erator = |c: &[f64; 3]| -> f64 {
+                let t1 = 0.5 * (c[0] + c[1] + c[2]);
+                #[rustfmt::skip]
+                let t2 = -phi * (
+                    4.0 * c[0] * c[2] * (1.0 - phi) +
+                    c[1] * (c[0] + c[2])
+                );
+                t1 * t1 + t2
+            };
+            f64::sqrt(erator(&self.b) / erator(&self.a))
+        }
     }
 
-    /// Make a new biquad filter with the given coefficients.
-    /// Initial state is zeros.
-    // (This is a Direct Form I implementation, per RBJ recommendation.)
+    /// Make a new biquad filter function with the given
+    /// coefficients.  Initial state is zeros.
+    // (This is a Direct Form I implementation, per RBJ
+    // recommendation.)
     pub fn make_filter(&self) -> impl FnMut(f64) -> f64 + '_ {
         let a_inv = 1.0 / self.a[0];
         let g = self.b[0] * a_inv;
