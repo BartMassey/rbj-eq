@@ -14,13 +14,13 @@ fn main() {
             slope: 1.0,
         },
     );
-    let mut filter = Filter::new(cs);
+    let mut filter = cs.make_filter();
 
     for i in 0..fs {
         // https://en.wikipedia.org/wiki/Chirp#Linear
         let t = i as f64 / fs as f64;
         let x = f64::sin(0.5 * 0.5 * fs as f64 * TAU * t * t);
-        let y = filter.filter(x);
+        let y = filter(x);
         println!("{} {}", i / 2, y);
     }
 }

@@ -30,7 +30,7 @@ safe Rust. What you get:
 # Examples
 
 ```
-use rbj_eq::{LowPassFilter, Filter, FilterWidth};
+use rbj_eq::{LowPassFilter, FilterWidth};
 
 // Make a sine wave at Nyquist.
 let samples: Vec<f64> = (0..128)
@@ -46,11 +46,11 @@ let cs = LowPassFilter.coeffs(
         slope: 1.0,
     },
 );
-let mut filter = Filter::new(cs);
+let mut filter = cs.make_filter();
 
 // Filter the signal.
 let filtered: Vec<f64> =
-    samples.into_iter().map(|x| filter.filter(x)).collect();
+    samples.into_iter().map(|x| filter(x)).collect();
 
 // The signal is damped. (The filter takes a few samples to converge.)
 for (i, y) in filtered.iter().skip(4).enumerate() {
@@ -272,38 +272,22 @@ impl FilterCoeffs {
         };
         f64::sqrt(erator(b) / erator(a))
     }
-}
 
-/// Biquad filter state (including coefficients).
-#[derive(Clone)]
-pub struct Filter {
-    ys: [f64; 2],
-    xs: [f64; 2],
-    coeffs: FilterCoeffs,
-}
-
-impl Filter {
     /// Make a new biquad filter with the given coefficients.
     /// Initial state is zeros.
-    pub fn new(coeffs: FilterCoeffs) -> Self {
-        Self {
-            ys: [0.0; 2],
-            xs: [0.0; 2],
-            coeffs,
+    pub fn make_filter(&self) -> impl FnMut(f64) -> f64 + '_ {
+        let mut ys = [0.0f64, 0.0];
+        let mut xs = [0.0f64, 0.0];
+        move |x| {
+            #[rustfmt::skip]
+            let y = self.g * x
+                + self.b[0] * xs[0] + self.b[1] * xs[1]
+                - self.a[0] * ys[0] - self.a[1] * ys[1];
+            ys[1] = ys[0];
+            ys[0] = y;
+            xs[1] = xs[0];
+            xs[0] = x;
+            y
         }
-    }
-
-    /// Step the filter forward, advancing the state and returning
-    /// one output.
-    pub fn filter(&mut self, x: f64) -> f64 {
-        #[rustfmt::skip]
-        let y = self.coeffs.g * x
-            + self.coeffs.b[0] * self.xs[0] + self.coeffs.b[1] * self.xs[1]
-            - self.coeffs.a[0] * self.ys[0] - self.coeffs.a[1] * self.ys[1];
-        self.ys[1] = self.ys[0];
-        self.ys[0] = y;
-        self.xs[1] = self.xs[0];
-        self.xs[0] = x;
-        y
     }
 }
