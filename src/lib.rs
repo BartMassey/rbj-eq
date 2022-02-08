@@ -234,22 +234,16 @@ impl FilterType {
     }
 }
 
-/// Biquad filter coefficients (normalized for filter operation).
+/// Biquad filter coefficients.
 #[derive(Clone)]
 pub struct FilterCoeffs {
-    g: f64,
-    b: [f64; 2],
-    a: [f64; 2],
+    b: [f64; 3],
+    a: [f64; 3],
 }
 
 impl FilterCoeffs {
     fn new(b: [f64; 3], a: [f64; 3]) -> Self {
-        let a_inv = 1.0 / a[0];
-        FilterCoeffs {
-            g: b[0] * a_inv,
-            b: [b[1] * a_inv, b[2] * a_inv],
-            a: [a[1] * a_inv, a[2] * a_inv],
-        }
+        Self { b, a }
     }
 
     /// Transfer function magnitude for filter, at given
@@ -259,9 +253,7 @@ impl FilterCoeffs {
     pub fn transfer(&self, w: f64) -> f64 {
         let phi = f64::sin(0.5 * w);
         let phi = phi * phi;
-        let a = [1.0, self.a[0], self.a[1]];
-        let b = [self.g, self.b[0], self.b[1]];
-        let erator = |c: [f64; 3]| -> f64 {
+        let erator = |c: &[f64; 3]| -> f64 {
             let t1 = 0.5 * (c[0] + c[1] + c[2]);
             #[rustfmt::skip]
             let t2 = -phi * (
@@ -270,19 +262,24 @@ impl FilterCoeffs {
             );
             t1 * t1 + t2
         };
-        f64::sqrt(erator(b) / erator(a))
+        f64::sqrt(erator(&self.b) / erator(&self.a))
     }
 
     /// Make a new biquad filter with the given coefficients.
     /// Initial state is zeros.
+    // (This is a Direct Form I implementation, per RBJ recommendation.)
     pub fn make_filter(&self) -> impl FnMut(f64) -> f64 + '_ {
+        let a_inv = 1.0 / self.a[0];
+        let g = self.b[0] * a_inv;
+        let b = [self.b[1] * a_inv, self.b[2] * a_inv];
+        let a = [self.a[1] * a_inv, self.a[2] * a_inv];
         let mut ys = [0.0f64, 0.0];
         let mut xs = [0.0f64, 0.0];
         move |x| {
             #[rustfmt::skip]
-            let y = self.g * x
-                + self.b[0] * xs[0] + self.b[1] * xs[1]
-                - self.a[0] * ys[0] - self.a[1] * ys[1];
+            let y = g * x
+                + b[0] * xs[0] + b[1] * xs[1]
+                - a[0] * ys[0] - a[1] * ys[1];
             ys[1] = ys[0];
             ys[0] = y;
             xs[1] = xs[0];
