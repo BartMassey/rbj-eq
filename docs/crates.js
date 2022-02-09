@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["rbj_eq"];
+window.ALL_CRATES = ["document_features","rbj_eq"];
