@@ -63,6 +63,12 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 
 (See the `examples` directory of this distribution for more examples.)
 
+## Feature Flags
+
+* `libm`: Use the `libm` crate and its port of the MUSL floating point
+  libraries to Rust, via the `num-traits` crate. This enables
+  `no_std`.
+
 
 Full crate [rustdoc](https://bartmassey.github.io/rbj-eq/rbj_eq/index.html)
 is available.

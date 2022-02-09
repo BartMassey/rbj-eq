@@ -8,3 +8,12 @@ license = "MIT"
 repository = "https://github.com/BartMassey/rbj-eq"
 readme = "README.md"
 categories = ["multimedia::audio"]
+
+[dependencies.num-traits]
+version = "0.2"
+default-features = false
+optional = true
+features = ["libm"]
+
+[features]
+libm = ["num-traits"]

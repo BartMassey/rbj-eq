@@ -59,12 +59,24 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 
 (See the `examples` directory of this distribution for more examples.)
 
+# Feature Flags
+
+* `libm`: Use the `libm` crate and its port of the MUSL floating point
+  libraries to Rust, via the `num-traits` crate. This enables
+  `no_std`.
+
 */
+
+// Use `libm` (ported MUSL via `num-traits`) floating-point
+// functions when building `no_std`.
+#![cfg_attr(feature = "libm", no_std)]
+#[cfg(feature = "libm")]
+use num_traits::float::Float;
+
+use core::f64::consts::TAU;
 
 mod filter_names;
 pub use filter_names::*;
-
-use std::f64::consts::TAU;
 
 #[doc(hidden)]
 /// Filter types for "standard" filters.
