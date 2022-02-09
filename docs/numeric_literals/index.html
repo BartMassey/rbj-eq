@@ -1,0 +1,101 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="numeric_literals is a Rust library that provides procedural attribute macros for replacing numeric literals with arbitrary expressions."><meta name="keywords" content="rust, rustlang, rust-lang, numeric_literals"><title>numeric_literals - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
+    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../numeric_literals/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate numeric_literals</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.2.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all numeric_literals's items</p></a><div id="sidebar-vars" data-name="numeric_literals" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">numeric_literals</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/numeric_literals/lib.rs.html#1-482" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p><strong>numeric_literals</strong> is a Rust library that provides procedural attribute macros for replacing
+numeric literals with arbitrary expressions.</p>
+<p>While Rust’s explicitness is generally a boon, it is a major pain when writing numeric
+code that is intended to be generic over a scalar type. As an example, consider
+writing a function that returns the golden ratio for any type that implements <code>T: num::Float</code>.
+An implementation might look like the following.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">num</span>;
+<span class="kw">use</span> <span class="ident">num::Float</span>;
+
+<span class="kw">fn</span> <span class="ident">golden_ratio</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Float</span><span class="op">&gt;</span>() -&gt; <span class="ident">T</span> {
+    ( <span class="ident">T::one</span>() <span class="op">+</span> <span class="ident">T::sqrt</span>(<span class="ident">T::from</span>(<span class="number">5</span>).<span class="ident">unwrap</span>())) <span class="op">/</span> <span class="ident">T::from</span>(<span class="number">2</span>).<span class="ident">unwrap</span>()
+}</code></pre></div>
+<p>This is arguably very messy for such a simple task. With <code>numeric_literals</code>, we may
+instead write:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">numeric_literals::replace_numeric_literals</span>;
+
+<span class="attribute">#[<span class="ident">replace_numeric_literals</span>(<span class="ident">T::from</span>(<span class="ident">literal</span>).<span class="ident">unwrap</span>())]</span>
+<span class="kw">fn</span> <span class="ident">golden_ratio</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Float</span><span class="op">&gt;</span>() -&gt; <span class="ident">T</span> {
+   (<span class="number">1</span> <span class="op">+</span> <span class="number">5</span>.<span class="ident">sqrt</span>()) <span class="op">/</span> <span class="number">2</span>
+}</code></pre></div>
+<p>The above two code segments do essentially the same thing
+(apart from using <code>T::from(1)</code> instead of <code>T::one()</code>). However, in the latter example,
+the <code>replace_numeric_literals</code> attribute replaces any numeric literal with the expression
+<code>T::from(literal).unwrap()</code>, where <code>literal</code> is a placeholder for each individual literal.</p>
+<p>There is no magic involved: the code is still explict about what it does to numeric literals.
+The difference is that we can declare this behavior once for all numeric literals. Moreover,
+we move the conversion behavior away from where the literals are needed, enhancing readability
+by reducing the noise imposed by being explicit about the exact types involved.</p>
+<h3 id="float-and-integer-literal-replacement" class="section-header"><a href="#float-and-integer-literal-replacement">Float and integer literal replacement</a></h3>
+<p>An issue with the replacement of numeric literals is that there is no way to distinguish
+literals that are used for e.g. indexing from those that are part of a numerical computation.
+In the example above, if you would additionally need to index into an array with a constant index
+such as <code>array[0]</code>, the macro will try to convert the index <code>0</code> to a float type, which
+would clearly fail. Thankfully, in most cases these examples will outright fail to compile
+because of type mismatch. One possible resolution to this problem is to use the separate
+macros <code>replace_float_literals</code> and <code>replace_int_literals</code>, which work in the exact same way,
+but only trigger on float or integer literals, respectively. Below is an example from
+Finite Element code that uses float literal replacement to improve readability of numerical
+constants in generic code.</p>
+
+<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore"><code><span class="attribute">#[<span class="ident">replace_float_literals</span>(<span class="ident">T::from_f64</span>(<span class="ident">literal</span>).<span class="ident">expect</span>(<span class="string">&quot;Literal must fit in T&quot;</span>))]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assemble_element_mass</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">quad</span>: <span class="kw-2">&amp;</span><span class="ident">Quad2d</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">MatrixN</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U8</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+   <span class="ident">T</span>: <span class="ident">RealField</span>
+{
+    <span class="kw">let</span> <span class="ident">phi</span> <span class="op">=</span> <span class="op">|</span><span class="ident">alpha</span>, <span class="ident">beta</span>, <span class="ident">xi</span>: <span class="kw-2">&amp;</span><span class="ident">Vector2</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">|</span> <span class="op">-</span>(<span class="number">1.0</span> <span class="op">+</span> <span class="ident">alpha</span> <span class="op">*</span> <span class="ident">xi</span>[<span class="number">0</span>]) <span class="op">*</span> (<span class="number">1.0</span> <span class="op">+</span> <span class="ident">beta</span> <span class="op">*</span> <span class="ident">xi</span>[<span class="number">1</span>]) <span class="op">/</span> <span class="number">4.0</span>;
+    <span class="kw">let</span> <span class="ident">phi_grad</span> <span class="op">=</span> <span class="op">|</span><span class="ident">alpha</span>, <span class="ident">beta</span>, <span class="ident">xi</span>: <span class="kw-2">&amp;</span><span class="ident">Vector2</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">|</span> {
+        <span class="ident">Vector2::new</span>(
+            <span class="ident">alpha</span> <span class="op">*</span> (<span class="number">1.0</span> <span class="op">+</span> <span class="ident">beta</span> <span class="op">*</span> <span class="ident">xi</span>[<span class="number">1</span>]) <span class="op">/</span> <span class="number">4.0</span>,
+            <span class="ident">beta</span> <span class="op">*</span> (<span class="number">1.0</span> <span class="op">+</span> <span class="ident">alpha</span> <span class="op">*</span> <span class="ident">xi</span>[<span class="number">0</span>]) <span class="op">/</span> <span class="number">4.0</span>,
+        )
+    };
+    <span class="kw">let</span> <span class="ident">alphas</span> <span class="op">=</span> [<span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="op">-</span><span class="number">1.0</span>];
+    <span class="kw">let</span> <span class="ident">betas</span> <span class="op">=</span> [<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>];
+
+    <span class="comment">// And so on...</span>
+}</code></pre></div>
+<p>In general, <strong>the macros should be used with caution</strong>. It is recommended to keep the macro close to
+the region in which the literals are being used, as to avoid confusion for readers of the code.
+The Rust code before macro expansion is usually not valid Rust (because of the lack of explicit
+type conversion), but without the context of the attribute, it is simply not clear why this
+code still compiles.</p>
+<p>An option for the future would be to apply the attribute only to very local blocks of code that
+are heavy on numerical constants. However, at present, Rust does not allow attribute macros
+to apply to blocks or single expressions.</p>
+<h3 id="replacement-in-macro-invocations" class="section-header"><a href="#replacement-in-macro-invocations">Replacement in macro invocations</a></h3>
+<p>By default, the macros of this crate will also replace literals inside of macro invocations.
+This allows code such as the following to compile:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">num::Float</span>;
+<span class="kw">use</span> <span class="ident">numeric_literals::replace_numeric_literals</span>;
+
+<span class="attribute">#[<span class="ident">replace_numeric_literals</span>(<span class="ident">T::from</span>(<span class="ident">literal</span>).<span class="ident">unwrap</span>())]</span>
+<span class="kw">fn</span> <span class="ident">zeros</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Float</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="macro">vec!</span>[<span class="number">0.0</span>; <span class="ident">n</span>]
+}</code></pre></div>
+<p>If this behavior is unwanted, it is possible to disable replacement inside of macros with a
+parameter:</p>
+
+<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore"><code><span class="attribute">#[<span class="ident">replace_numeric_literals</span>(<span class="ident">T::from</span>(<span class="ident">literal</span>).<span class="ident">unwrap</span>()), <span class="ident">visit_macros</span> <span class="op">=</span> <span class="bool-val">false</span>]</span></code></pre></div>
+<h3 id="literals-with-suffixes" class="section-header"><a href="#literals-with-suffixes">Literals with suffixes</a></h3>
+<p>In rust, literal suffixes can be used to disambiguate the type of a literal. For example, the suffix <code>_f64</code>
+in the expression <code>1_f64.sqrt()</code> makes it clear that the value <code>1</code> is of type <code>f64</code>. This is also supported
+by the macros of this crate for all floating point and integer suffixes. For example:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">num::Float</span>;
+<span class="kw">use</span> <span class="ident">numeric_literals::replace_numeric_literals</span>;
+
+<span class="attribute">#[<span class="ident">replace_numeric_literals</span>(<span class="ident">T::from</span>(<span class="ident">literal</span>).<span class="ident">unwrap</span>())]</span>
+<span class="kw">fn</span> <span class="ident">golden_ratio</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Float</span><span class="op">&gt;</span>() -&gt; <span class="ident">T</span> {
+    (<span class="number">1.0_f64</span> <span class="op">+</span> <span class="number">5f32</span>.<span class="ident">sqrt</span>()) <span class="op">/</span> <span class="number">2.0</span>
+}</code></pre></div>
+</div></details><h2 id="attributes" class="small-section-header"><a href="#attributes">Attribute Macros</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="attr" href="attr.replace_float_literals.html" title="numeric_literals::replace_float_literals attr">replace_float_literals</a></div><div class="item-right docblock-short"><p>Replace any float literal with custom transformation code.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="attr" href="attr.replace_int_literals.html" title="numeric_literals::replace_int_literals attr">replace_int_literals</a></div><div class="item-right docblock-short"><p>Replace any integer literal with custom transformation code.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="attr" href="attr.replace_numeric_literals.html" title="numeric_literals::replace_numeric_literals attr">replace_numeric_literals</a></div><div class="item-right docblock-short"><p>Replace any numeric literal with custom transformation code.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="numeric_literals" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</body></html>

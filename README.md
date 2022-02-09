@@ -1,7 +1,7 @@
 ![Maintenance](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
 
 # rbj-eq: Rust implementation of RBJ EQ filters
-Bart Massey 2022 (version 0.4.0)
+Bart Massey 2022 (version 0.5.0)
 
 ## Background
 
@@ -77,4 +77,11 @@ This crate is made available under the "MIT
 license". Please see the file `LICENSE.txt` in this distribution
 for license terms.
 
-Thanks to the `cargo-readme` crate for generation of this `README`.
+Thanks to Robert Bristow-Johnson for sharing not only these
+filters but a bunch of knowledge about how to implement
+them. Thanks to YouTuber Dan Worrall for introducing me to
+the RBJ filters, as well as for some amazing audio DSP
+content. Thanks to the authors of the `num-traits` and
+`numeric_literals` crates for making support for `f32`
+easy. Finally, thanks to the `cargo-readme` crate for
+generation of this `README`.
