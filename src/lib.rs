@@ -70,10 +70,9 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 // Use `libm` (ported MUSL via `num-traits`) floating-point
 // functions when building `no_std`.
 #![cfg_attr(feature = "libm", no_std)]
-#[cfg(feature = "libm")]
-use num_traits::float::Float;
 
-use core::f64::consts::TAU;
+use num_traits::float::*;
+use numeric_literals::replace_float_literals;
 
 mod filter_names;
 pub use filter_names::*;
@@ -132,20 +131,21 @@ use FilterType::*;
 
 /// Width / gain specification for filters.
 #[derive(Debug, Clone, Copy)]
-pub enum FilterWidth {
+pub enum FilterWidth<F: Float> {
     /// Specify width / gain using "EE Q".
-    Q(f64),
+    Q(F),
     /// Specify width / gain using filter half-band width.
-    BandWidth(f64),
+    BandWidth(F),
     /// Specify width / gain using filter peak gain and tail slope.
-    Slope { gain: f64, slope: f64 },
+    Slope { gain: F, slope: F },
 }
 
 impl FilterType {
     /// Calculate biquad filter coefficients for the given filter type,
     /// critical frequency (as fraction of Nyquist), and filter width.
-    pub fn coeffs(self, fc: f64, width: FilterWidth) -> FilterCoeffs {
-        let w0 = 0.5 * TAU * fc;
+    #[replace_float_literals(F::from(literal).unwrap())]
+    pub fn coeffs<F: Float + FloatConst>(self, fc: F, width: FilterWidth<F>) -> FilterCoeffs<F> {
+        let w0 = 0.5 * FloatConst::TAU() * fc;
         let sin_w0 = w0.sin();
         let (a2, alpha) = match width {
             FilterWidth::Q(q) => {
@@ -154,16 +154,16 @@ impl FilterType {
             }
             FilterWidth::BandWidth(bw) => {
                 #[rustfmt::skip]
-                let alpha = sin_w0 * f64::sinh(
-                    0.5 * f64::ln(2.0) * bw * w0 / sin_w0
+                let alpha = sin_w0 * F::sinh(
+                    0.5 * F::ln(2.0) * bw * w0 / sin_w0
                 );
                 (0.0, alpha)
             }
             FilterWidth::Slope { gain, slope } => {
-                let a2 = f64::powf(10.0, gain / 80.0);
+                let a2 = F::powf(10.0, gain / 80.0);
                 let a = a2 * a2;
                 #[rustfmt::skip]
-                let alpha = sin_w0 * 0.5 * f64::sqrt(
+                let alpha = sin_w0 * 0.5 * F::sqrt(
                     (a + 1.0 / a) * (1.0 / slope - 1.0) + 2.0
                 );
                 (a2, alpha)
@@ -246,13 +246,13 @@ impl FilterType {
 
 /// Biquad filter coefficients.
 #[derive(Clone)]
-pub struct FilterCoeffs {
-    b: [f64; 3],
-    a: [f64; 3],
+pub struct FilterCoeffs<F: Float> {
+    b: [F; 3],
+    a: [F; 3],
 }
 
-impl FilterCoeffs {
-    fn new(b: [f64; 3], a: [f64; 3]) -> Self {
+impl<F: Float> FilterCoeffs<F> {
+    fn new(b: [F; 3], a: [F; 3]) -> Self {
         Self { b, a }
     }
 
@@ -261,11 +261,12 @@ impl FilterCoeffs {
     /// nice [transformation by
     /// RBJ](https://dsp.stackexchange.com/a/16911) for
     /// better numerical stability.
-    pub fn make_transfer_mag(&self) -> impl Fn(f64) -> f64 + '_ {
-        |w: f64| {
-            let phi = f64::sin(0.5 * w);
+    #[replace_float_literals(F::from(literal).unwrap())]
+    pub fn make_transfer_mag(&self) -> impl Fn(F) -> F + '_ {
+        |w: F| {
+            let phi = F::sin(0.5 * w);
             let phi = phi * phi;
-            let erator = |c: &[f64; 3]| -> f64 {
+            let erator = |c: &[F; 3]| -> F {
                 let t1 = 0.5 * (c[0] + c[1] + c[2]);
                 #[rustfmt::skip]
                 let t2 = -phi * (
@@ -274,7 +275,7 @@ impl FilterCoeffs {
                 );
                 t1 * t1 + t2
             };
-            f64::sqrt(erator(&self.b) / erator(&self.a))
+            F::sqrt(erator(&self.b) / erator(&self.a))
         }
     }
 
@@ -282,13 +283,14 @@ impl FilterCoeffs {
     /// coefficients.  Initial state is zeros.
     // (This is a Direct Form I implementation, per RBJ
     // recommendation.)
-    pub fn make_filter(&self) -> impl FnMut(f64) -> f64 + '_ {
+    #[replace_float_literals(F::from(literal).unwrap())]
+    pub fn make_filter(&self) -> impl FnMut(F) -> F + '_ {
         let a_inv = 1.0 / self.a[0];
         let g = self.b[0] * a_inv;
         let b = [self.b[1] * a_inv, self.b[2] * a_inv];
         let a = [self.a[1] * a_inv, self.a[2] * a_inv];
-        let mut ys = [0.0f64, 0.0];
-        let mut xs = [0.0f64, 0.0];
+        let mut ys = [0.0, 0.0];
+        let mut xs = [0.0, 0.0];
         move |x| {
             #[rustfmt::skip]
             let y = g * x

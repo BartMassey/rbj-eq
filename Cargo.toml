@@ -1,6 +1,6 @@
 [package]
 name = "rbj-eq"
-version = "0.4.0"
+version = "0.5.0"
 edition = "2021"
 authors = ["Bart Massey <bart.massey@gmail.com>"]
 description = 'Robert Bristow-Johnson "equalizer filters"'
@@ -12,8 +12,12 @@ categories = ["multimedia::audio"]
 [dependencies.num-traits]
 version = "0.2"
 default-features = false
-optional = true
-features = ["libm"]
+features = []
+
+[dependencies]
+numeric_literals = "0.2"
 
 [features]
-libm = ["num-traits"]
+default = ["std"]
+libm = ["num-traits/libm"]
+std = ["num-traits/std"]
