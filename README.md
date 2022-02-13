@@ -1,7 +1,7 @@
 ![Maintenance](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
 
 # rbj-eq: Rust implementation of RBJ EQ filters
-Bart Massey 2022 (version 0.5.0)
+Bart Massey 2022 (version 0.5.1)
 
 ## Background
 

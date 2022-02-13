@@ -247,8 +247,8 @@ impl FilterType {
 /// Biquad filter coefficients.
 #[derive(Clone)]
 pub struct FilterCoeffs<F: Float> {
-    b: [F; 3],
-    a: [F; 3],
+    pub b: [F; 3],
+    pub a: [F; 3],
 }
 
 impl<F: Float> FilterCoeffs<F> {
