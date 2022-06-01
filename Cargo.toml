@@ -1,6 +1,6 @@
 [package]
-name = "rbj-eq"
-version = "0.5.1"
+name = "rbj_eq"
+version = "0.6.0"
 edition = "2021"
 authors = ["Bart Massey <bart.massey@gmail.com>"]
 description = 'Robert Bristow-Johnson "equalizer filters"'
@@ -18,6 +18,8 @@ features = []
 numeric_literals = "0.2"
 
 [features]
-default = ["std"]
-libm = ["num-traits/libm"]
-std = ["num-traits/std"]
+default = ["math_std", "capi"]
+math_libm = ["num-traits/libm"]
+math_std = ["std", "num-traits/std"]
+std = []
+capi = []

@@ -61,15 +61,28 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 
 # Feature Flags
 
-* `libm`: Use the `libm` crate and its port of the MUSL floating point
-  libraries to Rust, via the `num-traits` crate. This enables
-  `no_std`.
+* `math_libm`: Use the `libm` crate and its port of the MUSL
+  floating point libraries to Rust, via the `num-traits`
+  crate. At least one of `math_libm` or `math_std` must be
+  enabled.
+
+* `math_std`: Use the Rust `std` math library via the
+  `num-traits` crate. Implies `std`. At least one of
+  `math_libm` or `math_std` must be enabled.
+
+* `std`: Use the Rust `std` library. When not present, the
+  crate will be built `no_std`.
+
+* `capi`: Include a C FFI API.
 
 */
 
-// Use `libm` (ported MUSL via `num-traits`) floating-point
-// functions when building `no_std`.
-#![cfg_attr(feature = "libm", no_std)]
+#![cfg_attr(not(feature = "std"), no_std)]
+
+#[cfg(feature = "capi")]
+mod capi;
+#[cfg(feature = "capi")]
+pub use capi::*;
 
 use num_traits::float::*;
 use numeric_literals::replace_float_literals;
