@@ -1,0 +1,20 @@
+language = "C"
+pragma_once = true
+header = "/* machine-generated: do not edit */"
+include_version = true
+cpp_compat = true
+usize_is_size_t = true
+no_includes = true
+
+[export]
+include = ["filter_t", "filter_coeffs_d_t", "filter_coeffs_f_t"]
+
+[fn]
+prefix = "extern"
+args = "vertical"
+
+[parse]
+clean = true
+
+[parse.expand]
+crates = ["rbj_eq"]
