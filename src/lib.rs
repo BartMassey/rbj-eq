@@ -16,8 +16,8 @@ of languages. This is the author's implementation in Rust.
 
 # RBJ Filters
 
-This crate provides implementations of the RBJ filters in
-safe Rust. What you get:
+This `no_std` crate provides implementations of the RBJ
+filters in safe Rust. What you get:
 
 * Function to compute filter coefficients for the various
   RBJ filter types.
@@ -67,17 +67,14 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
   enabled.
 
 * `math_std`: Use the Rust `std` math library via the
-  `num-traits` crate. Implies `std`. At least one of
-  `math_libm` or `math_std` must be enabled.
-
-* `std`: Use the Rust `std` library. When not present, the
-  crate will be built `no_std`.
+  `num-traits` crate. At least one of `math_libm` or
+  `math_std` must be enabled.
 
 * `capi`: Include a C FFI API.
 
 */
 
-#![cfg_attr(not(feature = "std"), no_std)]
+#![no_std]
 
 #[cfg(feature = "capi")]
 mod capi;

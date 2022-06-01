@@ -24,10 +24,6 @@ See the `cargo-c` [repo](http://github.com/lu-zero/cargo-c)
 directory in this distribution has an example use of the C
 library.
 
-This crate can be used as a "`no_std`" library for embedded
-work. In this case it might use the Rust `libm` crate for
-its floating-point numeric functions.
-
 ## Addenda
 
 Full crate [rustdoc](https://bartmassey.github.io/rbj-eq/rbj_eq/index.html)
