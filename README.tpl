@@ -24,6 +24,12 @@ See the `cargo-c` [repo](http://github.com/lu-zero/cargo-c)
 directory in this distribution has an example use of the C
 library.
 
+## Python Implementation
+
+A bonus pure-Python implementation of these filters is
+provided in the `python/` subdirectory. It also includes the
+`sweep` example.
+
 ## Addenda
 
 Full crate [rustdoc](https://bartmassey.github.io/rbj-eq/rbj_eq/index.html)
