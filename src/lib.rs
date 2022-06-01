@@ -1,5 +1,4 @@
 /*!
-# Background
 
 Back in the day, DSP guru Robert Bristow-Johnson published a
 famous document titled [*Cookbook formulae for audio
@@ -14,7 +13,7 @@ having nice composability properties.
 Many implementations of the RBJ filters exist in a variety
 of languages. This is the author's implementation in Rust.
 
-# RBJ Filters
+## Rust RBJ Filter Crate
 
 This `no_std` crate provides implementations of the RBJ
 filters in safe Rust. What you get:
@@ -27,7 +26,7 @@ filters in safe Rust. What you get:
 
 * A stateful filter function, based on the coefficients.
 
-# Examples
+## Examples
 
 ```
 use rbj_eq::{LowPassFilter, FilterWidth};
@@ -59,7 +58,7 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 
 (See the `examples` directory of this distribution for more examples.)
 
-# Feature Flags
+## Feature Flags
 
 * `math_libm`: Use the `libm` crate and its port of the MUSL
   floating point libraries to Rust, via the `num-traits`

@@ -1,9 +1,13 @@
 ![Maintenance](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
 
-# rbj_eq: Rust implementation of RBJ EQ filters
+# rbj_eq: Implementation of RBJ EQ filters
 Bart Massey 2022 (version 0.6.0)
 
-## Background
+This crate has Rust and Python implementations of the RBJ EQ
+filters. The Rust implementation also provides a C library.
+
+## Rust Implementation
+
 
 Back in the day, DSP guru Robert Bristow-Johnson published a
 famous document titled [*Cookbook formulae for audio
@@ -18,7 +22,7 @@ having nice composability properties.
 Many implementations of the RBJ filters exist in a variety
 of languages. This is the author's implementation in Rust.
 
-## RBJ Filters
+### Rust RBJ Filter Crate
 
 This `no_std` crate provides implementations of the RBJ
 filters in safe Rust. What you get:
@@ -31,7 +35,7 @@ filters in safe Rust. What you get:
 
 * A stateful filter function, based on the coefficients.
 
-## Examples
+### Examples
 
 ```rust
 use rbj_eq::{LowPassFilter, FilterWidth};
@@ -63,7 +67,7 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 
 (See the `examples` directory of this distribution for more examples.)
 
-## Feature Flags
+### Feature Flags
 
 * `math_libm`: Use the `libm` crate and its port of the MUSL
   floating point libraries to Rust, via the `num-traits`
@@ -76,6 +80,12 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 
 * `capi`: Include a C FFI API.
 
+
+## Python Implementation
+
+A bonus pure-Python implementation of these filters is
+provided in the `python/` subdirectory. It also includes the
+`sweep` example.
 
 ## C API
 
@@ -95,12 +105,6 @@ See the `cargo-c` [repo](http://github.com/lu-zero/cargo-c)
 `README` for more information and options. The `c-examples/`
 directory in this distribution has an example use of the C
 library.
-
-## Python Implementation
-
-A bonus pure-Python implementation of these filters is
-provided in the `python/` subdirectory. It also includes the
-`sweep` example.
 
 ## Addenda
 

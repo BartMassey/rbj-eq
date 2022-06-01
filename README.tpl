@@ -1,9 +1,20 @@
 ![Maintenance](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
 
-# {{crate}}: Rust implementation of RBJ EQ filters
+# {{crate}}: Implementation of RBJ EQ filters
 Bart Massey 2022 (version {{version}})
 
+This crate has Rust and Python implementations of the RBJ EQ
+filters. The Rust implementation also provides a C library.
+
+## Rust Implementation
+
 {{readme}}
+
+## Python Implementation
+
+A bonus pure-Python implementation of these filters is
+provided in the `python/` subdirectory. It also includes the
+`sweep` example.
 
 ## C API
 
@@ -23,12 +34,6 @@ See the `cargo-c` [repo](http://github.com/lu-zero/cargo-c)
 `README` for more information and options. The `c-examples/`
 directory in this distribution has an example use of the C
 library.
-
-## Python Implementation
-
-A bonus pure-Python implementation of these filters is
-provided in the `python/` subdirectory. It also includes the
-`sweep` example.
 
 ## Addenda
 
