@@ -4,6 +4,7 @@ A C interface to the filter library.
 
 */
 
+/// C `enum` type for filters.
 #[allow(non_camel_case_types)]
 #[repr(C)]
 pub enum filter_t {
@@ -44,10 +45,13 @@ fn get_filter_type(filter_type: filter_t) -> crate::FilterType {
 
 macro_rules! filter_coeffs_t {
     ($name:ident, $ft:ty) => {
+        /// C API struct for filter coefficients.
         #[allow(non_camel_case_types)]
         #[repr(C)]
         pub struct $name {
+            /// Forward coefficients (numerator).
             pub b: [$ft; 3],
+            /// Reverse coefficients (denominator).
             pub a: [$ft; 3],
         }
     };
@@ -58,6 +62,8 @@ filter_coeffs_t!(filter_coeffs_f_t, f32);
 
 macro_rules! filter_coeffs_q {
     ($name:ident, $ft:ty, $result:tt) => {
+        /// C API function to obtain filter coefficients for
+        /// a filter specified by *Q* value.
         #[no_mangle]
         pub extern "C" fn $name(filter_type: filter_t, fc: $ft, q: $ft) -> $result {
             let filter_type = get_filter_type(filter_type);
@@ -73,6 +79,8 @@ filter_coeffs_q!(filter_coeffs_q_f, f32, filter_coeffs_f_t);
 
 macro_rules! filter_coeffs_bandwidth {
     ($name:ident, $ft:ty, $result:tt) => {
+        /// C API function to obtain filter coefficients for
+        /// a filter specified by bandwidth value.
         #[no_mangle]
         pub extern "C" fn $name(filter_type: filter_t, fc: $ft, band_width: $ft) -> $result {
             let filter_type = get_filter_type(filter_type);
@@ -89,6 +97,8 @@ filter_coeffs_bandwidth!(filter_coeffs_bandwidth_f, f32, filter_coeffs_f_t);
 
 macro_rules! filter_coeffs_slope {
     ($name:ident, $ft:ty, $result:tt) => {
+        /// C API function to obtain filter coefficients for
+        /// a filter specified by slope value.
         #[no_mangle]
         pub extern "C" fn $name(filter_type: filter_t, fc: $ft, gain: $ft, slope: $ft) -> $result {
             let filter_type = get_filter_type(filter_type);
@@ -104,6 +114,8 @@ filter_coeffs_slope!(filter_coeffs_slope_f, f32, filter_coeffs_f_t);
 
 macro_rules! filter_coeffs_df1_t {
     ($name:ident, $ft:ty) => {
+        /// C API for filter coefficients in Direct Form I,
+        /// suitable for running a filter.
         #[allow(non_camel_case_types)]
         #[repr(C)]
         pub struct $name {
@@ -119,6 +131,8 @@ filter_coeffs_df1_t!(filter_coeffs_df1_f_t, f32);
 
 macro_rules! to_df1 {
     ($name:ident, $src:ty, $result:tt) => {
+        /// C API for obtaining filter coefficients in
+        /// Direct Form I from raw coefficients.
         #[no_mangle]
         pub extern "C" fn $name(coeffs: &$src) -> $result {
             let a_inv = 1.0 / coeffs.a[0];
@@ -136,6 +150,10 @@ to_df1!(to_df1_f, filter_coeffs_f_t, filter_coeffs_df1_f_t);
 
 macro_rules! filter_df1 {
     ($name:ident, $ft:ty, $src:ty) => {
+        /// C API function to step a filter with the given
+        /// Direct Form 1 coefficients and given state
+        /// forward by one step given input `x`, returning the
+        /// next `y` value.
         #[no_mangle]
         pub extern "C" fn $name(cs: &$src, s: &mut [$ft;4], x: $ft) -> $ft {
             #[rustfmt::skip]
