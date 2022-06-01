@@ -20,6 +20,6 @@ numeric_literals = "0.2"
 [features]
 default = ["math_std", "capi"]
 math_libm = ["num-traits/libm"]
-math_std = ["std", "num-traits/std"]
+math_std = ["num-traits/std"]
 std = []
 capi = []
