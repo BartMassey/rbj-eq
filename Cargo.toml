@@ -14,6 +14,11 @@ version = "0.2"
 default-features = false
 features = []
 
+[dependencies.serde]
+version = "1.0.137"
+optional = true
+features = []
+
 [dependencies]
 numeric_literals = "0.2"
 
@@ -22,3 +27,4 @@ default = ["math_std", "capi"]
 math_libm = ["num-traits/libm"]
 math_std = ["num-traits/std"]
 capi = []
+serde = ["serde/derive"]

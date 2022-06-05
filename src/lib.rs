@@ -73,6 +73,9 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 
 * `capi`: Include a C FFI API.
 
+* `serde`: Support `serde::Serialize` and
+  `serde::Deserialize` for all data structures.
+
 */
 
 #![no_std]
@@ -81,6 +84,9 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 mod capi;
 #[cfg(feature = "capi")]
 pub use capi::*;
+
+#[cfg(feature = "serde")]
+use serde::{Serialize, Deserialize};
 
 use num_traits::float::*;
 use numeric_literals::replace_float_literals;
@@ -91,6 +97,7 @@ pub use filter_names::*;
 #[doc(hidden)]
 /// Filter types for "standard" filters.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum BasicFilter {
     /// Lowpass filter.
     LowPass,
@@ -110,6 +117,7 @@ use BasicFilter::*;
 #[doc(hidden)]
 /// Filter types for EQ shelf filters.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum ShelfFilter {
     /// Lowpass shelf filter.
     LowShelf,
@@ -121,6 +129,7 @@ use ShelfFilter::*;
 #[doc(hidden)]
 /// Filter types for EQ filters.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum EqFilter {
     /// Shelf filter.
     Shelf(ShelfFilter),
@@ -132,6 +141,7 @@ use EqFilter::*;
 #[doc(hidden)]
 /// Filters are either "standard" or RBJ-eq-style.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum FilterType {
     /// "Standard" filter.
     Basic(BasicFilter),
@@ -142,6 +152,7 @@ use FilterType::*;
 
 /// Width / gain specification for filters.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum FilterWidth<F: Float> {
     /// Specify width / gain using "EE Q".
     Q(F),
@@ -257,6 +268,7 @@ impl FilterType {
 
 /// Biquad filter coefficients.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct FilterCoeffs<F: Float> {
     pub b: [F; 3],
     pub a: [F; 3],
