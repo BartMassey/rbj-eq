@@ -183,16 +183,27 @@ impl FilterType {
     /// assert_eq!(round(cs.b), [0.5, 1.0, 0.5]);
     /// assert_eq!(round(cs.a), [1.7, 0.0, 0.3]);
     /// ```
+    ///
+    /// # Panics
+    /// 
+    /// Panics if `fc` is not in the range `0.0..1.0`.
+    /// Panics if specified filter Q, bandwidth,
+    /// gain or slope is negative.
     #[replace_float_literals(F::from(literal).unwrap())]
-    pub fn coeffs<F: Float + FloatConst>(self, fc: F, width: FilterWidth<F>) -> FilterCoeffs<F> {
+    pub fn coeffs<F>(self, fc: F, width: FilterWidth<F>) -> FilterCoeffs<F>
+    where F: Float + FloatConst + core::fmt::Debug
+    {
+        assert!(fc >= 0.0 && fc <= 1.0, "illegal critical frequency {fc:?}");
         let w0 = 0.5 * FloatConst::TAU() * fc;
         let sin_w0 = w0.sin();
         let (a2, alpha) = match width {
             FilterWidth::Q(q) => {
+                assert!(q >= 0.0, "illegal filter Q {q:?}");
                 let alpha = 0.5 * sin_w0 / q;
                 (0.0, alpha)
             }
             FilterWidth::BandWidth(bw) => {
+                assert!(bw >= 0.0, "illegal filter bandwidth {bw:?}");
                 #[rustfmt::skip]
                 let alpha = sin_w0 * F::sinh(
                     0.5 * F::ln(2.0) * bw * w0 / sin_w0
@@ -200,6 +211,8 @@ impl FilterType {
                 (0.0, alpha)
             }
             FilterWidth::Slope { gain, slope } => {
+                assert!(gain >= 0.0, "illegal filter gain {gain:?}");
+                assert!(slope >= 0.0, "illegal filter slope {slope:?}");
                 let a2 = F::powf(10.0, gain / 80.0);
                 let a = a2 * a2;
                 #[rustfmt::skip]
