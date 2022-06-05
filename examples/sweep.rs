@@ -12,7 +12,7 @@ fn main() {
             slope: 1.0,
         },
     );
-    let mut filter = cs.make_filter();
+    let mut filter = cs.to_filter();
 
     for i in 0..10_000 {
         // https://en.wikipedia.org/wiki/Chirp#Linear

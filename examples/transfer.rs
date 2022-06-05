@@ -13,7 +13,7 @@ fn main() {
         },
     );
 
-    let transfer = coeffs.make_transfer_mag();
+    let transfer = coeffs.to_transfer_fn();
     for i in 0..10_000 {
         let x = 0.5 * TAU * i as f64 / 10_000.0;
         let y = transfer(x);

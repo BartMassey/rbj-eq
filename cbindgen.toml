@@ -6,8 +6,8 @@ cpp_compat = true
 usize_is_size_t = true
 no_includes = true
 
-[export]
-include = ["filter_t", "filter_coeffs_d_t", "filter_coeffs_f_t"]
+#[export]
+#include = ["rbj_eq_t", "rbj_eq_coeffs_d_t", "rbj_eq_coeffs_f_t"]
 
 [fn]
 prefix = "extern"

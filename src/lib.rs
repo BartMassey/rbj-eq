@@ -1,3 +1,5 @@
+#![doc(html_root_url = "https://docs.rs/rbj_eq/0.7.0")]
+
 /*!
 
 Back in the day, DSP guru Robert Bristow-Johnson published a
@@ -44,7 +46,7 @@ let cs = LowPassFilter.coeffs(
         slope: 1.0,
     },
 );
-let mut filter = cs.make_filter();
+let mut filter = cs.to_filter();
 
 // Filter the signal.
 let filtered: Vec<f64> =
@@ -265,13 +267,13 @@ impl<F: Float> FilterCoeffs<F> {
         Self { b, a }
     }
 
-    /// Make a transfer function magnitude function. Input
-    /// is fraction of unit filter frequency.  This uses a
-    /// nice [transformation by
-    /// RBJ](https://dsp.stackexchange.com/a/16911) for
+    /// Returns a transfer function for this filter. Input
+    /// is fraction of unit filter frequency, output is
+    /// magnitude of gain.  This uses a nice [transformation
+    /// by RBJ](https://dsp.stackexchange.com/a/16911) for
     /// better numerical stability.
     #[replace_float_literals(F::from(literal).unwrap())]
-    pub fn make_transfer_mag(&self) -> impl Fn(F) -> F + '_ {
+    pub fn to_transfer_fn(&self) -> impl Fn(F) -> F + '_ {
         |w: F| {
             let phi = F::sin(0.5 * w);
             let phi = phi * phi;
@@ -293,7 +295,7 @@ impl<F: Float> FilterCoeffs<F> {
     // (This is a Direct Form I implementation, per RBJ
     // recommendation.)
     #[replace_float_literals(F::from(literal).unwrap())]
-    pub fn make_filter(&self) -> impl FnMut(F) -> F + '_ {
+    pub fn to_filter(&self) -> impl FnMut(F) -> F + '_ {
         let a_inv = 1.0 / self.a[0];
         let g = self.b[0] * a_inv;
         let b = [self.b[1] * a_inv, self.b[2] * a_inv];

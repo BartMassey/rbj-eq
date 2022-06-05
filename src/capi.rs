@@ -7,7 +7,7 @@ A C interface to the filter library.
 /// C `enum` type for filters.
 #[allow(non_camel_case_types)]
 #[repr(C)]
-pub enum filter_t {
+pub enum rbj_eq_t {
     /// Lowpass filter.
     LOW_PASS_FILTER,
     /// Highpass filter.
@@ -27,9 +27,9 @@ pub enum filter_t {
     /// Peaking bandpass filter.
     PEAKING_FILTER,
 }
-use filter_t::*;
+use rbj_eq_t::*;
 
-fn get_filter_type(filter_type: filter_t) -> crate::FilterType {
+fn get_filter_type(filter_type: rbj_eq_t) -> crate::FilterType {
     match filter_type {
         LOW_PASS_FILTER => crate::LowPassFilter,
         HIGH_PASS_FILTER => crate::HighPassFilter,
@@ -57,15 +57,15 @@ macro_rules! filter_coeffs_t {
     };
 }
 
-filter_coeffs_t!(filter_coeffs_d_t, f64);
-filter_coeffs_t!(filter_coeffs_f_t, f32);
+filter_coeffs_t!(rbj_eq_coeffs_d_t, f64);
+filter_coeffs_t!(rbj_eq_coeffs_f_t, f32);
 
 macro_rules! filter_coeffs_q {
     ($name:ident, $ft:ty, $result:tt) => {
         /// C API function to obtain filter coefficients for
         /// a filter specified by *Q* value.
         #[no_mangle]
-        pub extern "C" fn $name(filter_type: filter_t, fc: $ft, q: $ft) -> $result {
+        pub extern "C" fn $name(filter_type: rbj_eq_t, fc: $ft, q: $ft) -> $result {
             let filter_type = get_filter_type(filter_type);
             let crate::FilterCoeffs { a, b } =
                 filter_type.coeffs(fc, crate::FilterWidth::Q(q));
@@ -74,15 +74,15 @@ macro_rules! filter_coeffs_q {
     };
 }
 
-filter_coeffs_q!(filter_coeffs_q_d, f64, filter_coeffs_d_t);
-filter_coeffs_q!(filter_coeffs_q_f, f32, filter_coeffs_f_t);
+filter_coeffs_q!(rbj_eq_coeffs_q_d, f64, rbj_eq_coeffs_d_t);
+filter_coeffs_q!(rbj_eq_coeffs_q_f, f32, rbj_eq_coeffs_f_t);
 
 macro_rules! filter_coeffs_bandwidth {
     ($name:ident, $ft:ty, $result:tt) => {
         /// C API function to obtain filter coefficients for
         /// a filter specified by bandwidth value.
         #[no_mangle]
-        pub extern "C" fn $name(filter_type: filter_t, fc: $ft, band_width: $ft) -> $result {
+        pub extern "C" fn $name(filter_type: rbj_eq_t, fc: $ft, band_width: $ft) -> $result {
             let filter_type = get_filter_type(filter_type);
             let crate::FilterCoeffs { a, b } =
                 filter_type.coeffs(fc, crate::FilterWidth::BandWidth(band_width));
@@ -91,8 +91,8 @@ macro_rules! filter_coeffs_bandwidth {
     };
 }
 
-filter_coeffs_bandwidth!(filter_coeffs_bandwidth_d, f64, filter_coeffs_d_t);
-filter_coeffs_bandwidth!(filter_coeffs_bandwidth_f, f32, filter_coeffs_f_t);
+filter_coeffs_bandwidth!(rbj_eq_coeffs_bandwidth_d, f64, rbj_eq_coeffs_d_t);
+filter_coeffs_bandwidth!(rbj_eq_coeffs_bandwidth_f, f32, rbj_eq_coeffs_f_t);
 
 
 macro_rules! filter_coeffs_slope {
@@ -100,7 +100,12 @@ macro_rules! filter_coeffs_slope {
         /// C API function to obtain filter coefficients for
         /// a filter specified by slope value.
         #[no_mangle]
-        pub extern "C" fn $name(filter_type: filter_t, fc: $ft, gain: $ft, slope: $ft) -> $result {
+        pub extern "C" fn $name(
+            filter_type: rbj_eq_t,
+            fc: $ft,
+            gain: $ft,
+            slope: $ft,
+        ) -> $result {
             let filter_type = get_filter_type(filter_type);
             let crate::FilterCoeffs { a, b } =
                 filter_type.coeffs(fc, crate::FilterWidth::Slope { gain, slope });
@@ -109,8 +114,8 @@ macro_rules! filter_coeffs_slope {
     };
 }
 
-filter_coeffs_slope!(filter_coeffs_slope_d, f64, filter_coeffs_d_t);
-filter_coeffs_slope!(filter_coeffs_slope_f, f32, filter_coeffs_f_t);
+filter_coeffs_slope!(rbj_eq_coeffs_slope_d, f64, rbj_eq_coeffs_d_t);
+filter_coeffs_slope!(rbj_eq_coeffs_slope_f, f32, rbj_eq_coeffs_f_t);
 
 macro_rules! filter_coeffs_df1_t {
     ($name:ident, $ft:ty) => {
@@ -126,8 +131,8 @@ macro_rules! filter_coeffs_df1_t {
     };
 }
 
-filter_coeffs_df1_t!(filter_coeffs_df1_d_t, f64);
-filter_coeffs_df1_t!(filter_coeffs_df1_f_t, f32);
+filter_coeffs_df1_t!(rbj_eq_coeffs_df1_d_t, f64);
+filter_coeffs_df1_t!(rbj_eq_coeffs_df1_f_t, f32);
 
 macro_rules! to_df1 {
     ($name:ident, $src:ty, $result:tt) => {
@@ -145,8 +150,8 @@ macro_rules! to_df1 {
     };
 }
 
-to_df1!(to_df1_d, filter_coeffs_d_t, filter_coeffs_df1_d_t);
-to_df1!(to_df1_f, filter_coeffs_f_t, filter_coeffs_df1_f_t);
+to_df1!(rbj_eq_coeffs_to_df1_d, rbj_eq_coeffs_d_t, rbj_eq_coeffs_df1_d_t);
+to_df1!(rbj_eq_coeffs_to_df1_f, rbj_eq_coeffs_f_t, rbj_eq_coeffs_df1_f_t);
 
 macro_rules! filter_df1 {
     ($name:ident, $ft:ty, $src:ty) => {
@@ -169,5 +174,5 @@ macro_rules! filter_df1 {
     };
 }
 
-filter_df1!(filter_df1_d, f64, filter_coeffs_df1_d_t);
-filter_df1!(filter_df1_f, f32, filter_coeffs_df1_f_t);
+filter_df1!(rbj_eq_df1_d, f64, rbj_eq_coeffs_df1_d_t);
+filter_df1!(rbj_eq_df1_f, f32, rbj_eq_coeffs_df1_f_t);
