@@ -19,7 +19,7 @@ jobs:
         with:
           command: check
 
-  cegbuild:
+  ceg:
     name: C library example check
     runs-on: ubuntu-latest
     steps:
