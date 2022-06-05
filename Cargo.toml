@@ -32,5 +32,5 @@ math_std = ["num-traits/std"]
 capi = []
 serde = ["serde/derive"]
 
-[profile.release]
-panic = "abort"
+[badges.maintenance]
+status = "actively-developed"

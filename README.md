@@ -1,7 +1,11 @@
 ![Maintenance](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
+[![CI](https://github.com/BartMassey/rbj_eq/actions/workflows/main.yml/badge.svg)](https://github.com/BartMassey/rbj_eq/actions)
+[![crates-io](https://img.shields.io/crates/v/rbj_eq.svg)](https://crates.io/crates/rbj_eq)
+[![api-docs](https://docs.rs/rbj_eq/badge.svg)](https://docs.rs/rbj_eq)
+[![dependency-status](https://deps.rs/repo/github/BartMassey/rbj_eq/status.svg)](https://deps.rs/repo/github/BartMassey/rbj_eq)
 
 # rbj_eq: Implementation of RBJ EQ filters
-Bart Massey 2022 (version 0.6.0)
+Bart Massey 2022 (version 0.7.0)
 
 This crate has Rust and Python implementations of the RBJ EQ
 filters. The Rust implementation also provides a C library.
@@ -53,7 +57,7 @@ let cs = LowPassFilter.coeffs(
         slope: 1.0,
     },
 );
-let mut filter = cs.make_filter();
+let mut filter = cs.to_filter();
 
 // Filter the signal.
 let filtered: Vec<f64> =
@@ -79,6 +83,9 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
   `math_std` must be enabled.
 
 * `capi`: Include a C FFI API.
+
+* `serde`: Support `serde::Serialize` and
+  `serde::Deserialize` for all data structures.
 
 
 ## Python Implementation
