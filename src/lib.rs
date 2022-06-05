@@ -90,7 +90,7 @@ pub use filter_names::*;
 
 #[doc(hidden)]
 /// Filter types for "standard" filters.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum BasicFilter {
     /// Lowpass filter.
     LowPass,
@@ -109,7 +109,7 @@ use BasicFilter::*;
 
 #[doc(hidden)]
 /// Filter types for EQ shelf filters.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ShelfFilter {
     /// Lowpass shelf filter.
     LowShelf,
@@ -120,7 +120,7 @@ use ShelfFilter::*;
 
 #[doc(hidden)]
 /// Filter types for EQ filters.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum EqFilter {
     /// Shelf filter.
     Shelf(ShelfFilter),
@@ -131,7 +131,7 @@ use EqFilter::*;
 
 #[doc(hidden)]
 /// Filters are either "standard" or RBJ-eq-style.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum FilterType {
     /// "Standard" filter.
     Basic(BasicFilter),
@@ -141,7 +141,7 @@ pub enum FilterType {
 use FilterType::*;
 
 /// Width / gain specification for filters.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum FilterWidth<F: Float> {
     /// Specify width / gain using "EE Q".
     Q(F),
@@ -256,7 +256,7 @@ impl FilterType {
 }
 
 /// Biquad filter coefficients.
-#[derive(Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct FilterCoeffs<F: Float> {
     pub b: [F; 3],
     pub a: [F; 3],
