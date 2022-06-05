@@ -1,6 +1,6 @@
 [package]
 name = "rbj_eq"
-version = "0.6.0"
+version = "0.7.0"
 edition = "2021"
 authors = ["Bart Massey <bart.massey@gmail.com>"]
 description = 'Robert Bristow-Johnson "equalizer filters"'
@@ -8,6 +8,7 @@ license = "MIT"
 repository = "https://github.com/BartMassey/rbj-eq"
 readme = "README.md"
 categories = ["multimedia::audio"]
+keywords = ["audio", "dsp", "filter", "equalizer"]
 
 [dependencies.num-traits]
 version = "0.2"
