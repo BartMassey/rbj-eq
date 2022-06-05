@@ -385,10 +385,6 @@
 <span id="380">380</span>
 <span id="381">381</span>
 <span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
-<span id="386">386</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/rbj_eq/0.7.0&quot;</span>)]</span>
 
 <span class="doccomment">/*!
@@ -472,9 +468,12 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 <span class="attribute">#![<span class="ident">no_std</span>]</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;capi&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">capi</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">capi</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;capi&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">capi</span>::<span class="kw-2">*</span>;
+
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">filter_names</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">filter_names</span>::<span class="kw-2">*</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -482,11 +481,7 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 <span class="kw">use</span> <span class="ident">num_traits::float</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">numeric_literals::replace_float_literals</span>;
 
-<span class="kw">mod</span> <span class="ident">filter_names</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">filter_names</span>::<span class="kw-2">*</span>;
-
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="doccomment">/// Filter types for &quot;standard&quot; filters.</span>
+<span class="doccomment">/// Filter types for &quot;basic&quot; filters.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BasicFilter</span> {
@@ -505,7 +500,6 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 }
 <span class="kw">use</span> <span class="ident">BasicFilter</span>::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="doccomment">/// Filter types for EQ shelf filters.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
@@ -517,7 +511,6 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 }
 <span class="kw">use</span> <span class="ident">ShelfFilter</span>::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="doccomment">/// Filter types for EQ filters.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
@@ -529,8 +522,12 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 }
 <span class="kw">use</span> <span class="ident">EqFilter</span>::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="doccomment">/// Filters are either &quot;standard&quot; or RBJ-eq-style.</span>
+<span class="doccomment">/// Fundamental filter type.  Filters are either &quot;standard&quot;</span>
+<span class="doccomment">/// or RBJ-eq-style.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Rather than using this type directly, one would normally</span>
+<span class="doccomment">/// use one of the filter name `const`s from the</span>
+<span class="doccomment">/// [filter_names] module.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FilterType</span> {
@@ -554,8 +551,14 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 }
 
 <span class="kw">impl</span> <span class="ident">FilterType</span> {
-    <span class="doccomment">/// Calculate biquad filter coefficients for the given filter type,</span>
-    <span class="doccomment">/// critical frequency (as fraction of Nyquist), and filter width.</span>
+    <span class="doccomment">/// Calculate biquad filter coefficients for the given</span>
+    <span class="doccomment">/// filter type, critical frequency `f_crit` (as</span>
+    <span class="doccomment">/// fraction of Nyquist), and filter width.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that parameters are unchecked: asking for</span>
+    <span class="doccomment">/// something unexpected like `f_crit` not in</span>
+    <span class="doccomment">/// `0.0..=1.0` or negative bandwidth may not yield</span>
+    <span class="doccomment">/// meaningful results.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -574,28 +577,19 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
     <span class="doccomment">/// assert_eq!(round(cs.b), [0.5, 1.0, 0.5]);</span>
     <span class="doccomment">/// assert_eq!(round(cs.a), [1.7, 0.0, 0.3]);</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if `fc` is not in the range `0.0..1.0`.</span>
-    <span class="doccomment">/// Panics if specified filter Q, bandwidth,</span>
-    <span class="doccomment">/// gain or slope is negative.</span>
     <span class="attribute">#[<span class="ident">replace_float_literals</span>(<span class="ident">F::from</span>(<span class="ident">literal</span>).<span class="ident">unwrap</span>())]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coeffs</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">fc</span>: <span class="ident">F</span>, <span class="ident">width</span>: <span class="ident">FilterWidth</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="ident">FilterCoeffs</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coeffs</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f_crit</span>: <span class="ident">F</span>, <span class="ident">width</span>: <span class="ident">FilterWidth</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="ident">FilterCoeffs</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">Float</span> <span class="op">+</span> <span class="ident">FloatConst</span> <span class="op">+</span> <span class="ident">core::fmt::Debug</span>,
     {
-        <span class="macro">assert!</span>(<span class="ident">fc</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="ident">fc</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">1.0</span>, <span class="string">&quot;illegal critical frequency {fc:?}&quot;</span>);
-        <span class="kw">let</span> <span class="ident">w0</span> <span class="op">=</span> <span class="number">0.5</span> <span class="op">*</span> <span class="ident">FloatConst::TAU</span>() <span class="op">*</span> <span class="ident">fc</span>;
+        <span class="kw">let</span> <span class="ident">w0</span> <span class="op">=</span> <span class="number">0.5</span> <span class="op">*</span> <span class="ident">FloatConst::TAU</span>() <span class="op">*</span> <span class="ident">f_crit</span>;
         <span class="kw">let</span> <span class="ident">sin_w0</span> <span class="op">=</span> <span class="ident">w0</span>.<span class="ident">sin</span>();
         <span class="kw">let</span> (<span class="ident">a2</span>, <span class="ident">alpha</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">width</span> {
             <span class="ident">FilterWidth::Q</span>(<span class="ident">q</span>) =&gt; {
-                <span class="macro">assert!</span>(<span class="ident">q</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0.0</span>, <span class="string">&quot;illegal filter Q {q:?}&quot;</span>);
                 <span class="kw">let</span> <span class="ident">alpha</span> <span class="op">=</span> <span class="number">0.5</span> <span class="op">*</span> <span class="ident">sin_w0</span> <span class="op">/</span> <span class="ident">q</span>;
                 (<span class="number">0.0</span>, <span class="ident">alpha</span>)
             }
             <span class="ident">FilterWidth::BandWidth</span>(<span class="ident">bw</span>) =&gt; {
-                <span class="macro">assert!</span>(<span class="ident">bw</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0.0</span>, <span class="string">&quot;illegal filter bandwidth {bw:?}&quot;</span>);
                 <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
                 <span class="kw">let</span> <span class="ident">alpha</span> <span class="op">=</span> <span class="ident">sin_w0</span> <span class="op">*</span> <span class="ident">F::sinh</span>(
                     <span class="number">0.5</span> <span class="op">*</span> <span class="ident">F::ln</span>(<span class="number">2.0</span>) <span class="op">*</span> <span class="ident">bw</span> <span class="op">*</span> <span class="ident">w0</span> <span class="op">/</span> <span class="ident">sin_w0</span>
@@ -603,8 +597,6 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
                 (<span class="number">0.0</span>, <span class="ident">alpha</span>)
             }
             <span class="ident">FilterWidth::Slope</span> { <span class="ident">gain</span>, <span class="ident">slope</span> } =&gt; {
-                <span class="macro">assert!</span>(<span class="ident">gain</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0.0</span>, <span class="string">&quot;illegal filter gain {gain:?}&quot;</span>);
-                <span class="macro">assert!</span>(<span class="ident">slope</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0.0</span>, <span class="string">&quot;illegal filter slope {slope:?}&quot;</span>);
                 <span class="kw">let</span> <span class="ident">a2</span> <span class="op">=</span> <span class="ident">F::powf</span>(<span class="number">10.0</span>, <span class="ident">gain</span> <span class="op">/</span> <span class="number">80.0</span>);
                 <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">a2</span> <span class="op">*</span> <span class="ident">a2</span>;
                 <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>

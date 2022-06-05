@@ -81,9 +81,12 @@ for (i, y) in filtered.iter().skip(4).enumerate() {
 #![no_std]
 
 #[cfg(feature = "capi")]
-mod capi;
+pub mod capi;
 #[cfg(feature = "capi")]
 pub use capi::*;
+
+pub mod filter_names;
+pub use filter_names::*;
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -91,11 +94,7 @@ use serde::{Deserialize, Serialize};
 use num_traits::float::*;
 use numeric_literals::replace_float_literals;
 
-mod filter_names;
-pub use filter_names::*;
-
-#[doc(hidden)]
-/// Filter types for "standard" filters.
+/// Filter types for "basic" filters.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum BasicFilter {
@@ -114,7 +113,6 @@ pub enum BasicFilter {
 }
 use BasicFilter::*;
 
-#[doc(hidden)]
 /// Filter types for EQ shelf filters.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -126,7 +124,6 @@ pub enum ShelfFilter {
 }
 use ShelfFilter::*;
 
-#[doc(hidden)]
 /// Filter types for EQ filters.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -138,8 +135,12 @@ pub enum EqFilter {
 }
 use EqFilter::*;
 
-#[doc(hidden)]
-/// Filters are either "standard" or RBJ-eq-style.
+/// Fundamental filter type.  Filters are either "standard"
+/// or RBJ-eq-style.
+///
+/// Rather than using this type directly, one would normally
+/// use one of the filter name `const`s from the
+/// [filter_names] module.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum FilterType {

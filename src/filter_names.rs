@@ -1,5 +1,8 @@
 #![allow(non_upper_case_globals)]
 
+//! Filter name consts for the various filter types, to ease
+//! filter specification.
+
 use crate::*;
 
 /// Lowpass filter.
