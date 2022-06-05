@@ -32,6 +32,7 @@ cargo install cbindgen
 cargo install cargo-c
 cargo +nightly cbuild --release
 sudo cargo +nightly cinstall --release --prefix=/usr/local
+sudo cargo clean
 ```
 
 See the `cargo-c` [repo](http://github.com/lu-zero/cargo-c)
