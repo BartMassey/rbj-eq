@@ -185,13 +185,14 @@ impl FilterType {
     /// ```
     ///
     /// # Panics
-    /// 
+    ///
     /// Panics if `fc` is not in the range `0.0..1.0`.
     /// Panics if specified filter Q, bandwidth,
     /// gain or slope is negative.
     #[replace_float_literals(F::from(literal).unwrap())]
     pub fn coeffs<F>(self, fc: F, width: FilterWidth<F>) -> FilterCoeffs<F>
-    where F: Float + FloatConst + core::fmt::Debug
+    where
+        F: Float + FloatConst + core::fmt::Debug,
     {
         assert!(fc >= 0.0 && fc <= 1.0, "illegal critical frequency {fc:?}");
         let w0 = 0.5 * FloatConst::TAU() * fc;

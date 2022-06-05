@@ -16,12 +16,14 @@ default-features = false
 features = []
 
 [dependencies.serde]
-version = "1.0.137"
+version = "1.0"
 optional = true
-features = []
 
 [dependencies]
 numeric_literals = "0.2"
+
+[dev-dependencies]
+version-sync = "0.9"
 
 [features]
 default = ["math_std", "capi"]
