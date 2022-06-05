@@ -31,3 +31,6 @@ math_libm = ["num-traits/libm"]
 math_std = ["num-traits/std"]
 capi = []
 serde = ["serde/derive"]
+
+[profile.release]
+panic = "abort"
