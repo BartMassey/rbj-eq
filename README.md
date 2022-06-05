@@ -1,8 +1,8 @@
 ![Maintenance](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
-[![CI](https://github.com/BartMassey/rbj_eq/actions/workflows/main.yml/badge.svg)](https://github.com/BartMassey/rbj_eq/actions)
+[![CI](https://github.com/BartMassey/rbj-eq/actions/workflows/main.yml/badge.svg)](https://github.com/BartMassey/rbj-eq/actions)
 [![crates-io](https://img.shields.io/crates/v/rbj_eq.svg)](https://crates.io/crates/rbj_eq)
 [![api-docs](https://docs.rs/rbj_eq/badge.svg)](https://docs.rs/rbj_eq)
-[![dependency-status](https://deps.rs/repo/github/BartMassey/rbj_eq/status.svg)](https://deps.rs/repo/github/BartMassey/rbj_eq)
+[![dependency-status](https://deps.rs/repo/github/BartMassey/rbj-eq/status.svg)](https://deps.rs/repo/github/BartMassey/rbj-eq)
 
 # rbj_eq: Implementation of RBJ EQ filters
 Bart Massey 2022 (version 0.7.0)
