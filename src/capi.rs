@@ -67,8 +67,7 @@ macro_rules! filter_coeffs_q {
         #[no_mangle]
         pub extern "C" fn $name(filter_type: rbj_eq_t, fc: $ft, q: $ft) -> $result {
             let filter_type = get_filter_type(filter_type);
-            let crate::FilterCoeffs { a, b } =
-                filter_type.coeffs(fc, crate::FilterWidth::Q(q));
+            let crate::FilterCoeffs { a, b } = filter_type.coeffs(fc, crate::FilterWidth::Q(q));
             $result { a, b }
         }
     };
@@ -94,18 +93,12 @@ macro_rules! filter_coeffs_bandwidth {
 filter_coeffs_bandwidth!(rbj_eq_coeffs_bandwidth_d, f64, rbj_eq_coeffs_d_t);
 filter_coeffs_bandwidth!(rbj_eq_coeffs_bandwidth_f, f32, rbj_eq_coeffs_f_t);
 
-
 macro_rules! filter_coeffs_slope {
     ($name:ident, $ft:ty, $result:tt) => {
         /// C API function to obtain filter coefficients for
         /// a filter specified by slope value.
         #[no_mangle]
-        pub extern "C" fn $name(
-            filter_type: rbj_eq_t,
-            fc: $ft,
-            gain: $ft,
-            slope: $ft,
-        ) -> $result {
+        pub extern "C" fn $name(filter_type: rbj_eq_t, fc: $ft, gain: $ft, slope: $ft) -> $result {
             let filter_type = get_filter_type(filter_type);
             let crate::FilterCoeffs { a, b } =
                 filter_type.coeffs(fc, crate::FilterWidth::Slope { gain, slope });
@@ -150,8 +143,16 @@ macro_rules! to_df1 {
     };
 }
 
-to_df1!(rbj_eq_coeffs_to_df1_d, rbj_eq_coeffs_d_t, rbj_eq_coeffs_df1_d_t);
-to_df1!(rbj_eq_coeffs_to_df1_f, rbj_eq_coeffs_f_t, rbj_eq_coeffs_df1_f_t);
+to_df1!(
+    rbj_eq_coeffs_to_df1_d,
+    rbj_eq_coeffs_d_t,
+    rbj_eq_coeffs_df1_d_t
+);
+to_df1!(
+    rbj_eq_coeffs_to_df1_f,
+    rbj_eq_coeffs_f_t,
+    rbj_eq_coeffs_df1_f_t
+);
 
 macro_rules! filter_df1 {
     ($name:ident, $ft:ty, $src:ty) => {
@@ -160,7 +161,7 @@ macro_rules! filter_df1 {
         /// forward by one step given input `x`, returning the
         /// next `y` value.
         #[no_mangle]
-        pub extern "C" fn $name(cs: &$src, s: &mut [$ft;4], x: $ft) -> $ft {
+        pub extern "C" fn $name(cs: &$src, s: &mut [$ft; 4], x: $ft) -> $ft {
             #[rustfmt::skip]
             let y = cs.g * x
                 + cs.b[0] * s[0] + cs.b[1] * s[1]

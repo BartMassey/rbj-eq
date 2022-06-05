@@ -86,7 +86,7 @@ mod capi;
 pub use capi::*;
 
 #[cfg(feature = "serde")]
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use num_traits::float::*;
 use numeric_literals::replace_float_literals;
