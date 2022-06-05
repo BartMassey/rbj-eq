@@ -1,6 +1,6 @@
 [package]
 name = "rbj_eq"
-version = "0.7.0"
+version = "0.7.1"
 edition = "2021"
 authors = ["Bart Massey <bart.massey@gmail.com>"]
 description = 'Robert Bristow-Johnson "equalizer filters"'

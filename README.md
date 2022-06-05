@@ -5,7 +5,7 @@
 [![dependency-status](https://deps.rs/repo/github/BartMassey/rbj-eq/status.svg)](https://deps.rs/repo/github/BartMassey/rbj-eq)
 
 # rbj_eq: Implementation of RBJ EQ filters
-Bart Massey 2022 (version 0.7.0)
+Bart Massey 2022 (version 0.7.1)
 
 This crate has Rust and Python implementations of the RBJ EQ
 filters. The Rust implementation also provides a C library.
