@@ -165,6 +165,24 @@ pub enum FilterWidth<F: Float> {
 impl FilterType {
     /// Calculate biquad filter coefficients for the given filter type,
     /// critical frequency (as fraction of Nyquist), and filter width.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use rbj_eq::*;
+    /// let cs: FilterCoeffs<f64> = LowPassFilter.coeffs(
+    ///     0.5,
+    ///     FilterWidth::Slope {
+    ///         gain: 0.0,
+    ///         slope: 1.0,
+    ///     },
+    /// );
+    /// let round = |cs: [f64; 3]| {
+    ///     cs.iter().map(|&v| (v * 10.0).round() / 10.0).collect::<Vec<f64>>()
+    /// };
+    /// assert_eq!(round(cs.b), [0.5, 1.0, 0.5]);
+    /// assert_eq!(round(cs.a), [1.7, 0.0, 0.3]);
+    /// ```
     #[replace_float_literals(F::from(literal).unwrap())]
     pub fn coeffs<F: Float + FloatConst>(self, fc: F, width: FilterWidth<F>) -> FilterCoeffs<F> {
         let w0 = 0.5 * FloatConst::TAU() * fc;
@@ -262,7 +280,7 @@ impl FilterType {
                 }
             }
         };
-        FilterCoeffs::new(b, a)
+        FilterCoeffs { b, a }
     }
 }
 
@@ -275,15 +293,26 @@ pub struct FilterCoeffs<F: Float> {
 }
 
 impl<F: Float> FilterCoeffs<F> {
-    fn new(b: [F; 3], a: [F; 3]) -> Self {
-        Self { b, a }
-    }
-
     /// Returns a transfer function for this filter. Input
     /// is fraction of unit filter frequency, output is
     /// magnitude of gain.  This uses a nice [transformation
     /// by RBJ](https://dsp.stackexchange.com/a/16911) for
     /// better numerical stability.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use rbj_eq::*;
+    /// let cs: FilterCoeffs<f64> = LowPassFilter.coeffs(
+    ///     0.5,
+    ///     FilterWidth::Slope {
+    ///         gain: 0.0,
+    ///         slope: 1.0,
+    ///     },
+    /// );
+    /// let transfer = cs.to_transfer_fn();
+    /// assert_eq!(transfer(0.0), 1.0);
+    /// ```
     #[replace_float_literals(F::from(literal).unwrap())]
     pub fn to_transfer_fn(&self) -> impl Fn(F) -> F + '_ {
         |w: F| {
@@ -304,6 +333,20 @@ impl<F: Float> FilterCoeffs<F> {
 
     /// Make a new biquad filter function with the given
     /// coefficients.  Initial state is zeros.
+    /// # Examples
+    ///
+    /// ```
+    /// # use rbj_eq::*;
+    /// let cs: FilterCoeffs<f64> = LowPassFilter.coeffs(
+    ///     0.5,
+    ///     FilterWidth::Slope {
+    ///         gain: 0.0,
+    ///         slope: 1.0,
+    ///     },
+    /// );
+    /// let mut filter = cs.to_filter();
+    /// assert_eq!(filter(0.0), 0.0);
+    /// ```
     // (This is a Direct Form I implementation, per RBJ
     // recommendation.)
     #[replace_float_literals(F::from(literal).unwrap())]
