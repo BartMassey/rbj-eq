@@ -20,4 +20,4 @@ for i in range(10_000):
     t = i / 10_000.0
     x = np.sin(0.5 * 0.5 * 10_000.0 * tau * t * t)
     y = filter(x)
-    print(i / 2, y)
+    print(i / 10_000.0, round(y, 6))

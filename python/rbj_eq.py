@@ -17,6 +17,10 @@ _shelf_filters = {
 }
 
 def filter_coeffs(ft, fc, width):
+    """
+    Use scipy.signal.tf2sos(coeffs[0], coeffs[1]) to
+    convert to a form suitable for scipy.signal.sosfilt
+    """
     w0 = 0.5 * tau * fc
     sin_w0 = np.sin(w0)
     if width[0] == 'q':
